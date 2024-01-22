@@ -1,41 +1,98 @@
 from fastapi import FastAPI, Depends, HTTPException
-from pydantic import BaseModel, constr
-#from datetime import datetime
-#import json, jsonschema
+from pydantic import BaseModel
+from datetime import datetime
+import re, math
 
 app = FastAPI(title="Delivery Fee API")
 
 # Constants
+MAX_DELIVERY_FEE = 1500
+FREE_DELIVERY_CART_VALUE = 200000
+NO_SURCHARGE_MIN_CART_VALUE = 1000
+RUSH_HOUR_MULTIPLIER = 1.2
+# Distance constants
+STARTING_DISTANCE = 1000
+DISTANCE_STARTING_FEE = 200
+DISTANCE_HALF_KM_FEE = 100
+# Items constants
+MAX_ITEMS_NO_SURCHARGE = 4
+ADDITIONAL_FEE_PER_ITEM = 50
+ITEMS_BULK_NUMBER = 12
+ITEMS_BULK_FEE = 120
+# Order format constants
 MIN_CART_VALUE = 1
 MIN_DELIVERY_DISTANCE = 0
 MIN_NUMBER_OF_ITEMS = 1
-TIME_FORMAT_REGEX = r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$'
-
-FREE_DELIVERY_CART_VALUE = 200000
+TIME_FORMAT_REGEX = r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z'
+TIME_FORMAT_DATETIME = "%Y-%m-%dT%H:%M:%SZ"
 
 # Class representing an order, post requests must follow this format.
 class Order(BaseModel):
 	cart_value: int
 	delivery_distance: int
 	number_of_items: int
-	time: constr(regex=TIME_FORMAT_REGEX)
+	time: str
 
-# Validates the data recieved in the request body.
+# Validates that the request body is correctly formatted, and returns (an)
+# appropriate error description(s) where applicable.
 def	validate_order_data(order_data: Order):
 	error_messages = []
-	if order_data.cart_value <= 0:
-		error_messages.append("Cart value must be greater than 0 cents.")
-	if order_data.delivery_distance < 0:
-		error_messages.append("Delivery distance must not be a negative value.")
-	if order_data.number_of_items <= 0:
-		error_messages.append("Cart must contain at least one item.")
+	if order_data.cart_value < MIN_CART_VALUE:
+		error_messages.append("Cart value must be greater than 0")
+	if order_data.delivery_distance < MIN_DELIVERY_DISTANCE:
+		error_messages.append("Delivery distance must not be a negative value")
+	if order_data.number_of_items < MIN_NUMBER_OF_ITEMS:
+		error_messages.append("Number of items must be greater than 0")
+	if not re.match(TIME_FORMAT_REGEX, order_data.time):
+		error_messages.append("Invalid time format. It should be in the format 'YYYY-MM-DDTHH:MM:SSZ'")
 	if error_messages:
 		raise HTTPException(status_code=400, detail=", ".join(error_messages))
+	return order_data
 
-@app.post("/")
+# Calculates the surcharge depending on the distance of the order
+def distance_surcharge(distance: int) -> int:
+	if distance <= STARTING_DISTANCE:
+		return DISTANCE_STARTING_FEE
+	half_kms_started = math.ceil((distance - STARTING_DISTANCE) / 500)
+	return DISTANCE_STARTING_FEE + (DISTANCE_HALF_KM_FEE * half_kms_started)
+
+# Calculates the possible surcharge and bulk fee depending on
+# the number of items in cart
+def items_surcharge(items: int) -> int:
+	fee = 0
+	if items > MAX_ITEMS_NO_SURCHARGE:
+		fee = ADDITIONAL_FEE_PER_ITEM * (items - MAX_ITEMS_NO_SURCHARGE)
+	if items > ITEMS_BULK_NUMBER:
+		fee += ITEMS_BULK_FEE
+	return fee
+
+# Returns true if the order was placed during rush hour (Friday 3-7 PM)
+def is_rush_hour(time: str) -> bool:
+	try:
+		order_time = datetime.strptime(time, TIME_FORMAT_DATETIME)
+		if order_time.weekday() == 4:
+			return 15 <= order_time.hour < 19
+		else:
+			return False
+	except ValueError:
+		return False
+
+# Calculates the full delivery fee according to the instructions
+def calculate_delivery_fee(order_data: Order) -> float:
+	fee: float = 0
+	if order_data.cart_value >= FREE_DELIVERY_CART_VALUE:
+		return 0 # free delivery on orders over a certain value.
+	if order_data.cart_value < NO_SURCHARGE_MIN_CART_VALUE:
+		fee = NO_SURCHARGE_MIN_CART_VALUE - order_data.cart_value
+	fee += distance_surcharge(order_data.delivery_distance)
+	fee += items_surcharge(order_data.number_of_items)
+	if is_rush_hour(order_data.time):
+		fee = fee * RUSH_HOUR_MULTIPLIER
+	if fee > MAX_DELIVERY_FEE:
+		return MAX_DELIVERY_FEE # the delivery fee cannot exceed this.
+	return fee
+
+@app.post("/delivery_fee")
 def fee_calculator(order_data: Order = Depends(validate_order_data)):
-	print(order_data)
-	return {"recieved data": order_data}
-
-
-
+	fee: int = int(calculate_delivery_fee(order_data))
+	return {"delivery_fee": fee}
