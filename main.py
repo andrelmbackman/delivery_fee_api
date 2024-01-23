@@ -1,8 +1,8 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Body
 from pydantic import BaseModel
 from datetime import datetime
 import re, math
-from app.error_messages import (
+from error_messages import (
 	INVALID_CART_VALUE,
 	INVALID_DELIVERY_DISTANCE,
 	INVALID_NUMBER_OF_ITEMS,
@@ -41,7 +41,7 @@ class Order(BaseModel):
 
 # Validates that the request body is correctly formatted, and returns (an)
 # appropriate error description(s) where applicable.
-def	validate_order_data(order_data: Order):
+def	validate_order_data(order_data: Order = Body(...)):
 	error_messages = []
 	if order_data.cart_value < MIN_CART_VALUE:
 		error_messages.append(INVALID_CART_VALUE)
