@@ -79,13 +79,11 @@ def items_surcharge(items: int) -> int:
 
 
 # Returns true if the order was placed during rush hour (Friday 3-7 PM).
+# The datetime object is naive, and assumes that the timezone is UTC.
 def is_rush_hour(time: str) -> bool:
     try:
         order_time = datetime.strptime(time, TIME_FORMAT_DATETIME)
-        if order_time.weekday() == 4:
-            return 15 <= order_time.hour < 19
-        else:
-            return False
+        return order_time.weekday() == 4 and 15 <= order_time.hour < 19
     # This should never happen.
     except Exception:
         return False
