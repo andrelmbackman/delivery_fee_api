@@ -34,7 +34,7 @@ TIME_FORMAT_REGEX = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z"
 TIME_FORMAT_DATETIME = "%Y-%m-%dT%H:%M:%SZ"
 
 
-# Class representing an order, post requests must follow this format.
+# Class representing an order, the request body must follow this format.
 # By default, extra fields are not forbidden, but disregarded.
 class Order(BaseModel):
     cart_value: int
@@ -60,7 +60,7 @@ def validate_order_data(order_data: Order = Body(...)):
     return order_data
 
 
-# Calculates the surcharge depending on the distance of the order
+# Calculates the surcharge depending on the distance of the order.
 def distance_surcharge(distance: int) -> int:
     if distance <= STARTING_DISTANCE:
         return DISTANCE_STARTING_FEE
@@ -68,8 +68,7 @@ def distance_surcharge(distance: int) -> int:
     return DISTANCE_STARTING_FEE + (DISTANCE_HALF_KM_FEE * half_kms_started)
 
 
-# Calculates the possible surcharge and bulk fee depending on
-# the number of items
+# Calculates the possible surcharge and bulk fee depending on the number of items.
 def items_surcharge(items: int) -> int:
     fee = 0
     if items > MAX_ITEMS_NO_SURCHARGE:
@@ -79,7 +78,7 @@ def items_surcharge(items: int) -> int:
     return fee
 
 
-# Returns true if the order was placed during rush hour (Friday 3-7 PM)
+# Returns true if the order was placed during rush hour (Friday 3-7 PM).
 def is_rush_hour(time: str) -> bool:
     try:
         order_time = datetime.strptime(time, TIME_FORMAT_DATETIME)
@@ -87,14 +86,15 @@ def is_rush_hour(time: str) -> bool:
             return 15 <= order_time.hour < 19
         else:
             return False
-    except ValueError:
+    # This should never happen.
+    except Exception:
         return False
 
 
-# Calculates the full delivery fee according to the instructions
+# Calculates the full delivery fee according to the instructions.
 def calculate_delivery_fee(order_data: Order) -> float:
     fee: float = 0
-    # free delivery on orders over a certain value.
+    # Free delivery on orders over a certain value.
     if order_data.cart_value >= FREE_DELIVERY_CART_VALUE:
         return 0
     if order_data.cart_value < NO_SURCHARGE_MIN_CART_VALUE:
@@ -103,7 +103,7 @@ def calculate_delivery_fee(order_data: Order) -> float:
     fee += items_surcharge(order_data.number_of_items)
     if is_rush_hour(order_data.time):
         fee = fee * RUSH_HOUR_MULTIPLIER
-    # the delivery fee cannot exceed this.
+    # The delivery fee cannot exceed this.
     if fee > MAX_DELIVERY_FEE:
         return MAX_DELIVERY_FEE
     return fee
