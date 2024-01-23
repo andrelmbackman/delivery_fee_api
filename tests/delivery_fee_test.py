@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 import pytest, math
-from app.main import app
-from app.error_messages import (
+from main import app
+from error_messages import (
 	INVALID_CART_VALUE,
 	INVALID_DELIVERY_DISTANCE,
 	INVALID_NUMBER_OF_ITEMS,
@@ -225,7 +225,7 @@ def test_cart_values(value):
 	assert response.status_code == 200
 	assert response.json() == expected_response
 
-# Test full range of delivery distance fees.
+# Test full range of delivery distance fee.
 @pytest.mark.parametrize("distance", range(501, 7002, 500))
 def test_delivery_distance(distance):
 	client = TestClient(app)
