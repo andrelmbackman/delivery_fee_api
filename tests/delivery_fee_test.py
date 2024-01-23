@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
-import pytest, math
+import pytest
+import math
 from main import app
 from error_messages import (
 	INVALID_CART_VALUE,

@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException, Body
 from pydantic import BaseModel
 from datetime import datetime
-import re, math
+import re
+import math
 from error_messages import (
 	INVALID_CART_VALUE,
 	INVALID_DELIVERY_DISTANCE,
@@ -33,6 +34,7 @@ TIME_FORMAT_REGEX = r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z'
 TIME_FORMAT_DATETIME = "%Y-%m-%dT%H:%M:%SZ"
 
 # Class representing an order, post requests must follow this format.
+# By default, extra fields are not forbidden, but disregarded.
 class Order(BaseModel):
 	cart_value: int
 	delivery_distance: int
