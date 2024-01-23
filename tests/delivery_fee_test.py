@@ -225,7 +225,7 @@ def test_cart_values(value):
 	assert response.status_code == 200
 	assert response.json() == expected_response
 
-# Test all delivery distances from starting fee to the maximum delivery fee.
+# Test full range of delivery distance fees.
 @pytest.mark.parametrize("distance", range(501, 7002, 500))
 def test_delivery_distance(distance):
 	client = TestClient(app)
