@@ -2,12 +2,18 @@ from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from datetime import datetime
 import re, math
+from app.error_messages import (
+	INVALID_CART_VALUE,
+	INVALID_DELIVERY_DISTANCE,
+	INVALID_NUMBER_OF_ITEMS,
+	INVALID_TIME_FORMAT
+)
 
 app = FastAPI(title="Delivery Fee API")
 
 # Constants
 MAX_DELIVERY_FEE = 1500
-FREE_DELIVERY_CART_VALUE = 200000
+FREE_DELIVERY_CART_VALUE = 20000
 NO_SURCHARGE_MIN_CART_VALUE = 1000
 RUSH_HOUR_MULTIPLIER = 1.2
 # Distance constants
@@ -38,13 +44,13 @@ class Order(BaseModel):
 def	validate_order_data(order_data: Order):
 	error_messages = []
 	if order_data.cart_value < MIN_CART_VALUE:
-		error_messages.append("Cart value must be greater than 0")
+		error_messages.append(INVALID_CART_VALUE)
 	if order_data.delivery_distance < MIN_DELIVERY_DISTANCE:
-		error_messages.append("Delivery distance must not be a negative value")
+		error_messages.append(INVALID_DELIVERY_DISTANCE)
 	if order_data.number_of_items < MIN_NUMBER_OF_ITEMS:
-		error_messages.append("Number of items must be greater than 0")
+		error_messages.append(INVALID_NUMBER_OF_ITEMS)
 	if not re.match(TIME_FORMAT_REGEX, order_data.time):
-		error_messages.append("Invalid time format. It should be in the format 'YYYY-MM-DDTHH:MM:SSZ'")
+		error_messages.append(INVALID_TIME_FORMAT)
 	if error_messages:
 		raise HTTPException(status_code=400, detail=", ".join(error_messages))
 	return order_data
@@ -57,7 +63,7 @@ def distance_surcharge(distance: int) -> int:
 	return DISTANCE_STARTING_FEE + (DISTANCE_HALF_KM_FEE * half_kms_started)
 
 # Calculates the possible surcharge and bulk fee depending on
-# the number of items in cart
+# the number of items
 def items_surcharge(items: int) -> int:
 	fee = 0
 	if items > MAX_ITEMS_NO_SURCHARGE:
@@ -80,16 +86,18 @@ def is_rush_hour(time: str) -> bool:
 # Calculates the full delivery fee according to the instructions
 def calculate_delivery_fee(order_data: Order) -> float:
 	fee: float = 0
+	# free delivery on orders over a certain value.
 	if order_data.cart_value >= FREE_DELIVERY_CART_VALUE:
-		return 0 # free delivery on orders over a certain value.
+		return 0
 	if order_data.cart_value < NO_SURCHARGE_MIN_CART_VALUE:
 		fee = NO_SURCHARGE_MIN_CART_VALUE - order_data.cart_value
 	fee += distance_surcharge(order_data.delivery_distance)
 	fee += items_surcharge(order_data.number_of_items)
 	if is_rush_hour(order_data.time):
 		fee = fee * RUSH_HOUR_MULTIPLIER
+	# the delivery fee cannot exceed this.
 	if fee > MAX_DELIVERY_FEE:
-		return MAX_DELIVERY_FEE # the delivery fee cannot exceed this.
+		return MAX_DELIVERY_FEE
 	return fee
 
 @app.post("/delivery_fee")
