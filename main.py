@@ -24,7 +24,7 @@ DISTANCE_HALF_KM_FEE = 100
 # Items constants
 MAX_ITEMS_NO_SURCHARGE = 4
 ADDITIONAL_FEE_PER_ITEM = 50
-ITEMS_BULK_NUMBER = 12
+MAX_ITEMS_NO_BULK_FEE = 12
 ITEMS_BULK_FEE = 120
 # Order format constants
 MIN_CART_VALUE = 1
@@ -73,7 +73,7 @@ def items_surcharge(items: int) -> int:
     fee = 0
     if items > MAX_ITEMS_NO_SURCHARGE:
         fee = ADDITIONAL_FEE_PER_ITEM * (items - MAX_ITEMS_NO_SURCHARGE)
-    if items > ITEMS_BULK_NUMBER:
+    if items > MAX_ITEMS_NO_BULK_FEE:
         fee += ITEMS_BULK_FEE
     return fee
 
