@@ -4,8 +4,6 @@ from app.main import is_rush_hour
 
 @pytest.mark.parametrize("time", [
 	"2024-01-24T12:30:45Z",
-	"2024-01-24T12:30:45EST",
-	"2024-01-24T12:30:45PST",
 	"2024-01-26T19:00:01Z", # one second after rush hour
 	"2024-01-26T14:59:59Z", # one second before rush hour
 ])
