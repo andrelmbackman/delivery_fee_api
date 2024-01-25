@@ -17,11 +17,11 @@
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 ### Try it out:
-- Uvicorn will tell you the address on which it runs
-- in a browser: append '/docs' to this address to try it out!
+- send post requests to localhost:8000/delivery_fee
+- in a browser: http://localhost:8000/docs shows fastAPI's documentation and lets you try it out
 - alternatively:
 ```
 curl -X "POST" -H "Content-Type: application/json" -d "{\"cart_value\": 790, \"delivery_distance\": 2235, \"number_of_items\": 4, \"time\": \"2024-01-15T13:00:00Z\"}" localhost:8000/delivery_fee
