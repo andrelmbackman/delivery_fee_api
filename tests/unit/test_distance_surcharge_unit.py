@@ -21,18 +21,8 @@ def test_starting_distance():
     assert distance_surcharge(const.STARTING_DISTANCE) == const.DISTANCE_STARTING_FEE
 
 # Test if the right fee is added
-@pytest.mark.parametrize("distance, multiplier", [
-    (1, 1),
-    (501, 2),
-    (1001, 3),
-    (1501, 4),
-    (2001, 5),
-    (2501, 6),
-    (3001, 7)
-])
-def test_above_starting_distance(distance, multiplier):
-    added_distance = const.STARTING_DISTANCE + distance
+@pytest.mark.parametrize("multiplier", [1, 2, 3, 4, 5, 6, 7, 8, 9])
+def test_above_starting_distance(multiplier):
+    added_distance = const.STARTING_DISTANCE + (multiplier * 500)
     expected_surcharge = const.DISTANCE_STARTING_FEE + (multiplier * const.DISTANCE_HALF_KM_FEE)
     assert distance_surcharge(added_distance) == expected_surcharge
-
-

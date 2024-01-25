@@ -164,6 +164,26 @@ def test_rush_hour_minimum_distance_5_items():
         response = client.post(API_ENDPOINT, json=data)
     assert response.status_code == 200
     assert response.json() == expected_response
+    
+@pytest.mark.parametrize("time", [
+	"2024-01-26T17:00:45Z",
+	"2024-01-26T12:00:45-05:00",
+	"2024-01-26T09:00:45-08:00",
+	"2024-01-26T18:00:45+01:00",
+	"2024-01-27T02:00:45+09:00"
+])
+def test_rush_hour_time_zones(time):
+    with TestClient(app) as client:
+        data = {
+            "cart_value": 1000,
+            "delivery_distance": 500,
+            "number_of_items": 5,
+            "time": time,
+        }
+        expected_response = {"delivery_fee": 300}
+        response = client.post(API_ENDPOINT, json=data)
+    assert response.status_code == 200
+    assert response.json() == expected_response
 
 
 def test_valid_cheap_order():
