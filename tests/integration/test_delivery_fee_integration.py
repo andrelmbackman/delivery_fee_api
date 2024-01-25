@@ -1,8 +1,8 @@
 from fastapi.testclient import TestClient
 import pytest
 import math
-from main import app
-from error_messages import (
+from app.main import app
+from app.error_messages import (
     INVALID_CART_VALUE,
     INVALID_DELIVERY_DISTANCE,
     INVALID_NUMBER_OF_ITEMS,
@@ -215,7 +215,7 @@ def test_small_value_big_distance():
             "delivery_distance": 20000,
             "number_of_items": 4,
             "time": "2024-01-23T23:00:00Z",
-        }  # Should NOT be 4990
+        }
         expected_response = {"delivery_fee": 1500}
         response = client.post(API_ENDPOINT, json=data)
         assert response.status_code == 200
