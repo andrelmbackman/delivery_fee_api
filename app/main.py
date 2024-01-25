@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException, Body
-from datetime import datetime
+from datetime import datetime, timezone
 from dateutil import parser
 import math
-from models import Order
-import constants as const
-import error_messages as err
+from app.models import Order
+import app.constants as const
+import app.error_messages as err
 
 app = FastAPI(title="Delivery Fee API")
 
@@ -45,14 +45,16 @@ def items_surcharge(items: int) -> int:
     return fee
 
 
-# Returns true if the order was placed during rush hour (Friday 3-7 PM).
-# The datetime object is naive, and assumes that the timezone is UTC.
+# Returns true if the order was placed during rush hour (Friday 3-7 PM) UTC.
 def is_rush_hour(time: str) -> bool:
     try:
-        order_time = datetime.strptime(time, const.TIME_FORMAT_DATETIME)
-        return order_time.weekday() == 4 and 15 <= order_time.hour < 19
-    # This should never happen.
+        order_time: datetime = parser.isoparse(time)
+        print(order_time)
+        order_time_utc = order_time.astimezone(timezone.utc)
+        return order_time_utc.weekday() == 4 and 15 <= order_time_utc.hour < 19
+    # This should never happen, parsed in validate_order_data
     except Exception:
+        print("DOES NOT COMPUTE DATETIME")
         return False
 
 
@@ -67,6 +69,7 @@ def validate_order_data(order_data: Order = Body(...)):
     if order_data.number_of_items < const.MIN_NUMBER_OF_ITEMS:
         error_messages.append(err.INVALID_NUMBER_OF_ITEMS)
     try:
+        print(parser.isoparse(order_data.time))
         parser.isoparse(order_data.time)
     except Exception as e:
         error_messages.append(err.INVALID_TIME_FORMAT + str(e))
