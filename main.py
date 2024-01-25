@@ -1,14 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException, Body
 from datetime import datetime
+from dateutil import parser
 import math
-import constants as const
 from models import Order
-from error_messages import (
-    INVALID_CART_VALUE,
-    INVALID_DELIVERY_DISTANCE,
-    INVALID_NUMBER_OF_ITEMS,
-    #INVALID_TIME_FORMAT,
-)
+import constants as const
+import error_messages as err
 
 app = FastAPI(title="Delivery Fee API")
 
@@ -65,13 +61,15 @@ def is_rush_hour(time: str) -> bool:
 def validate_order_data(order_data: Order = Body(...)):
     error_messages = []
     if order_data.cart_value < const.MIN_CART_VALUE:
-        error_messages.append(INVALID_CART_VALUE)
+        error_messages.append(err.INVALID_CART_VALUE)
     if order_data.delivery_distance < const.MIN_DELIVERY_DISTANCE:
-        error_messages.append(INVALID_DELIVERY_DISTANCE)
+        error_messages.append(err.INVALID_DELIVERY_DISTANCE)
     if order_data.number_of_items < const.MIN_NUMBER_OF_ITEMS:
-        error_messages.append(INVALID_NUMBER_OF_ITEMS)
-    #if not re.match(const.TIME_FORMAT_REGEX, order_data.time):
-    #    error_messages.append(INVALID_TIME_FORMAT) VALIDATE TIME HERE; DATETIME
+        error_messages.append(err.INVALID_NUMBER_OF_ITEMS)
+    try:
+        parser.isoparse(order_data.time)
+    except Exception as e:
+        error_messages.append(err.INVALID_TIME_FORMAT + str(e))
     if error_messages:
         raise HTTPException(status_code=400, detail=", ".join(error_messages))
     return order_data
