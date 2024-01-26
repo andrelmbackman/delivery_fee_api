@@ -13,12 +13,21 @@
 ```
 ## Usage
 ### The simplest way is using a virtual environment (python 3.10 or higher):
+#### Linux, MacOS:
 ```bash 
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
+#### Windows:
+- same, but replace ```source .venv/bin/activate```  
+with ```.venv/Scripts/Activate.ps1``` (PowerShell)
+or ```.venv/Scripts/activate.bat``` (CMD)
+
+#### To exit the virtual environment:
+```deactivate```
+
 ### Try it out:
 - send post requests to localhost:8000/delivery_fee
 - in a browser: http://localhost:8000/docs shows fastAPI's documentation and lets you try it out
@@ -37,6 +46,7 @@ httpx==0.26.0
 pydantic==2.5.3
 pytest==7.4.4
 uvicorn==0.27.0
+python-dateutil==2.8.2
 ```
 #### Special thanks to [Jerry Pussinen](https://github.com/jerry-git) for the inspiring FastAPI workshop!
   
