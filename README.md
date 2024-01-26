@@ -57,6 +57,7 @@ pydantic==2.5.3
 pytest==7.4.4
 uvicorn==0.27.0
 python-dateutil==2.8.2
+types-python-dateutil==2.8.19.20240106
 ```
 #### Special thanks to [Jerry Pussinen](https://github.com/jerry-git) for the inspiring FastAPI workshop!
   
