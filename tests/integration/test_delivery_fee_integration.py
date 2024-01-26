@@ -31,6 +31,7 @@ def test_invalid_keys():
         response = client.post(API_ENDPOINT, json=data)
         assert response.status_code == 422
 
+
 def test_invalid_cart_value():
     with TestClient(app) as client:
         data = {
@@ -49,6 +50,7 @@ def test_invalid_cart_value():
         }
         response = client.post(API_ENDPOINT, json=data)
         assert response.status_code == 422
+
 
 def test_invalid_distance():
     with TestClient(app) as client:
@@ -74,35 +76,62 @@ def test_invalid_items():
         assert response.status_code == 422
 
 
-@pytest.mark.parametrize("time", [
-	"24-01-26T17:00:45Z",
-    "9999-99-99T17:00:45Z",
-    "2024-01-01T99:99:99.999Z",
-    "2020-0-15Ö00:00:00Q",
-    "0-01-15T13:00:00",
-    "2023-x-y5T13:00:00",
-    "2024-01-26T17:00:45+00Z",
-	"2024-01-26T17:00:45-00Z",
-    "2024-01-26T17:00"
-])
+@pytest.mark.parametrize(
+    "time",
+    [
+        "24-01-26T17:00:45Z",
+        "9999-99-99T17:00:45Z",
+        "2024-01-01T99:99:99.999Z",
+        "2020-0-15Ö00:00:00Q",
+        "0-01-15T13:00:00",
+        "2023-x-y5T13:00:00",
+        "2024-01-26T17:00:45+00Z",
+        "2024-01-26T17:00:45-00Z",
+        "2024-01-26T17:00",
+    ],
+)
 def test_invalid_time_formats(time):
     with TestClient(app) as client:
         data = {
             "cart_value": 790,
             "delivery_distance": 2235,
             "number_of_items": 4,
-            "time": time
+            "time": time,
         }
         response = client.post(API_ENDPOINT, json=data)
         assert response.status_code == 400
         assert INVALID_TIME_FORMAT in response.json()["detail"]
 
-@pytest.mark.parametrize("data", [
-    {"cart_value": "1000", "delivery_distance": 1000, "number_of_items": 1, "time": "2024-01-23T17:00:45Z"},
-    {"cart_value": 1000, "delivery_distance": "1000", "number_of_items": 1, "time": "2024-01-23T17:00:45Z"},
-    {"cart_value": 1000, "delivery_distance": 1000, "number_of_items": "1", "time": "2024-01-23T17:00:45Z"},
-    {"cart_value": 1000, "delivery_distance": 1000, "number_of_items": 1, "time": 2024}
-])
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        {
+            "cart_value": "1000",
+            "delivery_distance": 1000,
+            "number_of_items": 1,
+            "time": "2024-01-23T17:00:45Z",
+        },
+        {
+            "cart_value": 1000,
+            "delivery_distance": "1000",
+            "number_of_items": 1,
+            "time": "2024-01-23T17:00:45Z",
+        },
+        {
+            "cart_value": 1000,
+            "delivery_distance": 1000,
+            "number_of_items": "1",
+            "time": "2024-01-23T17:00:45Z",
+        },
+        {
+            "cart_value": 1000,
+            "delivery_distance": 1000,
+            "number_of_items": 1,
+            "time": 2024,
+        },
+    ],
+)
 def test_invalid_data_types(data):
     with TestClient(app) as client:
         response = client.post(API_ENDPOINT, json=data)
@@ -122,47 +151,51 @@ def test_valid_request():
     assert response.status_code == 200
     assert response.json() == expected_response
 
-@pytest.mark.parametrize("time", [
-	"2024-01-26T17:00:45Z",
-    "2024-01-26T18:00:45+01:00",
-    "2024-01-26T19:00:45+02:00",
-    "2024-01-26T20:00:45+03:00",
-    "2024-01-26T21:00:45+04:00",
-    "2024-01-26T22:00:45+05:00",
-    "2024-01-26T23:00:45+06:00",
-    "2024-01-27T00:00:45+07:00",
-    "2024-01-27T01:00:45+08:00",
-    "2024-01-27T02:00:45+09:00",
-    "2024-01-27T03:00:45+10:00",
-    "2024-01-27T04:00:45+11:00",
-    "2024-01-27T05:00:45+12:00",
-    "2024-01-26T16:00:45-01:00",
-    "2024-01-26T15:00:45-02:00",
-    "2024-01-26T14:00:45-03:00",
-    "2024-01-26T13:00:45-04:00",
-    "2024-01-26T12:00:45-05:00",
-    "2024-01-26T11:00:45-06:00",
-    "2024-01-26T10:00:45-07:00",
-    "2024-01-26T09:00:45-08:00",
-    "2024-01-26T08:00:45-09:00",
-    "2024-01-26T07:00:45-10:00",
-    "2024-01-26T06:00:45-11:00",
-    "2024-01-26T05:00:45-12:00",
-    "2024-01-26T17:00:45.000Z",
-	"2024-01-26T17:00:45Z",
-	"2024-01-26T17:00:45+00",
-	"2024-01-26T17:00:45+0000",
-	"2024-01-26T17:00:45+00:00",
-	"2024-01-26T17:00:45.000+00",
-	"2024-01-26T17:00:45.000+0000",
-	"2024-01-26T17:00:45.000+00:00",
-	"2024-01-26T17:00:45-00",
-	"2024-01-26T17:00:45-0000",
-	"2024-01-26T17:00:45-00:00",
-	"2024-01-26T17:00:45.000-00",
-	"2024-01-26T17:00:45.001-0000",
-	"2024-01-26T17:00:45.090-00:00"
-])
+
+@pytest.mark.parametrize(
+    "time",
+    [
+        "2024-01-26T17:00:45Z",
+        "2024-01-26T18:00:45+01:00",
+        "2024-01-26T19:00:45+02:00",
+        "2024-01-26T20:00:45+03:00",
+        "2024-01-26T21:00:45+04:00",
+        "2024-01-26T22:00:45+05:00",
+        "2024-01-26T23:00:45+06:00",
+        "2024-01-27T00:00:45+07:00",
+        "2024-01-27T01:00:45+08:00",
+        "2024-01-27T02:00:45+09:00",
+        "2024-01-27T03:00:45+10:00",
+        "2024-01-27T04:00:45+11:00",
+        "2024-01-27T05:00:45+12:00",
+        "2024-01-26T16:00:45-01:00",
+        "2024-01-26T15:00:45-02:00",
+        "2024-01-26T14:00:45-03:00",
+        "2024-01-26T13:00:45-04:00",
+        "2024-01-26T12:00:45-05:00",
+        "2024-01-26T11:00:45-06:00",
+        "2024-01-26T10:00:45-07:00",
+        "2024-01-26T09:00:45-08:00",
+        "2024-01-26T08:00:45-09:00",
+        "2024-01-26T07:00:45-10:00",
+        "2024-01-26T06:00:45-11:00",
+        "2024-01-26T05:00:45-12:00",
+        "2024-01-26T17:00:45.000Z",
+        "2024-01-26T17:00:45Z",
+        "2024-01-26T17:00:45+00",
+        "2024-01-26T17:00:45+0000",
+        "2024-01-26T17:00:45+00:00",
+        "2024-01-26T17:00:45.000+00",
+        "2024-01-26T17:00:45.000+0000",
+        "2024-01-26T17:00:45.000+00:00",
+        "2024-01-26T17:00:45-00",
+        "2024-01-26T17:00:45-0000",
+        "2024-01-26T17:00:45-00:00",
+        "2024-01-26T17:00:45.000-00",
+        "2024-01-26T17:00:45.001-0000",
+        "2024-01-26T17:00:45.090-00:00",
+    ],
+)
 def test_rush_hour(time):
     with TestClient(app) as client:
         data = {
@@ -190,6 +223,7 @@ def test_rush_hour_minimum_distance():
     assert response.status_code == 200
     assert response.json() == expected_response
 
+
 def test_rush_hour_minimum_distance_cart_surcharge():
     with TestClient(app) as client:
         data = {
@@ -203,6 +237,7 @@ def test_rush_hour_minimum_distance_cart_surcharge():
     assert response.status_code == 200
     assert response.json() == expected_response
 
+
 def test_rush_hour_minimum_distance_5_items():
     with TestClient(app) as client:
         data = {
@@ -215,14 +250,18 @@ def test_rush_hour_minimum_distance_5_items():
         response = client.post(API_ENDPOINT, json=data)
     assert response.status_code == 200
     assert response.json() == expected_response
-    
-@pytest.mark.parametrize("time", [
-	"2024-01-26T17:00:45Z",
-	"2024-01-26T12:00:45-05:00",
-	"2024-01-26T09:00:45-08:00",
-	"2024-01-26T18:00:45+01:00",
-	"2024-01-27T02:00:45+09:00"
-])
+
+
+@pytest.mark.parametrize(
+    "time",
+    [
+        "2024-01-26T17:00:45Z",
+        "2024-01-26T12:00:45-05:00",
+        "2024-01-26T09:00:45-08:00",
+        "2024-01-26T18:00:45+01:00",
+        "2024-01-27T02:00:45+09:00",
+    ],
+)
 def test_rush_hour_time_zones(time):
     with TestClient(app) as client:
         data = {
