@@ -2,12 +2,7 @@ from fastapi.testclient import TestClient
 import pytest
 import math
 from app.main import app
-from app.error_messages import (
-    INVALID_CART_VALUE,
-    INVALID_DELIVERY_DISTANCE,
-    INVALID_NUMBER_OF_ITEMS,
-    INVALID_TIME_FORMAT,
-)
+from app.error_messages import INVALID_TIME_FORMAT
 
 API_ENDPOINT = "/delivery_fee"
 
@@ -36,6 +31,24 @@ def test_invalid_keys():
         response = client.post(API_ENDPOINT, json=data)
         assert response.status_code == 422
 
+def test_invalid_cart_value():
+    with TestClient(app) as client:
+        data = {
+            "cart_value": 0,
+            "delivery_distance": 2235,
+            "number_of_items": 4,
+            "time": "2024-01-26T16:00:00Z",
+        }
+        response = client.post(API_ENDPOINT, json=data)
+        assert response.status_code == 422
+        data = {
+            "cart_value": -999,
+            "delivery_distance": 2235,
+            "number_of_items": 4,
+            "time": "2024-01-26T16:00:00Z",
+        }
+        response = client.post(API_ENDPOINT, json=data)
+        assert response.status_code == 422
 
 def test_invalid_distance():
     with TestClient(app) as client:
@@ -46,8 +59,7 @@ def test_invalid_distance():
             "time": "2024-01-26T16:00:00Z",
         }
         response = client.post(API_ENDPOINT, json=data)
-        assert response.status_code == 400
-        assert INVALID_DELIVERY_DISTANCE in response.json()["detail"]
+        assert response.status_code == 422
 
 
 def test_invalid_items():
@@ -59,12 +71,13 @@ def test_invalid_items():
             "time": "2024-01-26T16:00:00Z",
         }
         response = client.post(API_ENDPOINT, json=data)
-        assert response.status_code == 400
-        assert INVALID_NUMBER_OF_ITEMS in response.json()["detail"]
+        assert response.status_code == 422
 
 
 @pytest.mark.parametrize("time", [
 	"24-01-26T17:00:45Z",
+    "9999-99-99T17:00:45Z",
+    "2024-01-01T99:99:99.999Z",
     "2020-0-15Ö00:00:00Q",
     "0-01-15T13:00:00",
     "2023-x-y5T13:00:00",
@@ -84,21 +97,16 @@ def test_invalid_time_formats(time):
         assert response.status_code == 400
         assert INVALID_TIME_FORMAT in response.json()["detail"]
 
-
-def test_all_invalid():
+@pytest.mark.parametrize("data", [
+    {"cart_value": "1000", "delivery_distance": 1000, "number_of_items": 1, "time": "2024-01-23T17:00:45Z"},
+    {"cart_value": 1000, "delivery_distance": "1000", "number_of_items": 1, "time": "2024-01-23T17:00:45Z"},
+    {"cart_value": 1000, "delivery_distance": 1000, "number_of_items": "1", "time": "2024-01-23T17:00:45Z"},
+    {"cart_value": 1000, "delivery_distance": 1000, "number_of_items": 1, "time": 2024}
+])
+def test_invalid_data_types(data):
     with TestClient(app) as client:
-        data = {
-            "cart_value": -1,
-            "delivery_distance": -1,
-            "number_of_items": -4,
-            "time": "2020-0-15Ö00:00:00Q",
-        }
         response = client.post(API_ENDPOINT, json=data)
-        assert response.status_code == 400
-        assert INVALID_CART_VALUE in response.json()["detail"]
-        assert INVALID_DELIVERY_DISTANCE in response.json()["detail"]
-        assert INVALID_NUMBER_OF_ITEMS in response.json()["detail"]
-        assert INVALID_TIME_FORMAT in response.json()["detail"]
+        assert response.status_code == 422
 
 
 def test_valid_request():
@@ -247,6 +255,16 @@ def test_free_delivery():
     with TestClient(app) as client:
         data = {
             "cart_value": 20000,
+            "delivery_distance": 500,
+            "number_of_items": 1,
+            "time": "2024-01-15T13:00:00Z",
+        }
+        expected_response = {"delivery_fee": 0}
+        response = client.post(API_ENDPOINT, json=data)
+        assert response.status_code == 200
+        assert response.json() == expected_response
+        data = {
+            "cart_value": 9999999,
             "delivery_distance": 500,
             "number_of_items": 1,
             "time": "2024-01-15T13:00:00Z",
