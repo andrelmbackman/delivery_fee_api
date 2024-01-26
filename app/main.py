@@ -22,7 +22,7 @@ def calculate_delivery_fee(order_data: Order) -> float:
     fee += items_surcharge(order_data.number_of_items)
     if is_rush_hour(order_data.time):
         fee = fee * const.RUSH_HOUR_MULTIPLIER
-    if fee > const.MAX_DELIVERY_FEE: # The delivery fee cannot exceed this.
+    if fee > const.MAX_DELIVERY_FEE:  # The delivery fee cannot exceed this.
         return const.MAX_DELIVERY_FEE
     return fee
 
