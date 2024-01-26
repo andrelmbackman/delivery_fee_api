@@ -28,10 +28,11 @@ or ```.venv/Scripts/activate.bat``` (CMD)
 #### To exit the virtual environment:
 ```deactivate```
 
-### Try it out:
-- send post requests to ```localhost:8000/delivery_fee``` 
-- in a browser: http://localhost:8000/docs shows fastAPI's documentation and lets you try it out
-- alternatively:
+## Try it out:
+- send post requests to ```127.0.0.1:8000/delivery_fee``` 
+- alternative address: ```localhost:8000/delivery_fee```
+- in a browser: https://127.0.0.1:8000/docs shows fastAPI's documentation and lets you try it out
+- send a post request from terminal:
 ```
 curl -X "POST" -H "Content-Type: application/json" -d "{\"cart_value\": 790, \"delivery_distance\": 2235, \"number_of_items\": 4, \"time\": \"2024-01-15T13:00:00Z\"}" localhost:8000/delivery_fee
 ```
