@@ -29,7 +29,7 @@ or ```.venv/Scripts/activate.bat``` (CMD)
 ```deactivate```
 
 ### Try it out:
-- send post requests to localhost:8000/delivery_fee
+- send post requests to ```localhost:8000/delivery_fee``` 
 - in a browser: http://localhost:8000/docs shows fastAPI's documentation and lets you try it out
 - alternatively:
 ```
