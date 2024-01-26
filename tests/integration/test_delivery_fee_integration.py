@@ -63,31 +63,22 @@ def test_invalid_items():
         assert INVALID_NUMBER_OF_ITEMS in response.json()["detail"]
 
 
-def test_invalid_time_formats():
+@pytest.mark.parametrize("time", [
+	"24-01-26T17:00:45Z",
+    "2020-0-15Ö00:00:00Q",
+    "0-01-15T13:00:00",
+    "2023-x-y5T13:00:00",
+    "2024-01-26T17:00:45+00Z",
+	"2024-01-26T17:00:45-00Z",
+    "2024-01-26T17:00"
+])
+def test_invalid_time_formats(time):
     with TestClient(app) as client:
         data = {
             "cart_value": 790,
             "delivery_distance": 2235,
             "number_of_items": 4,
-            "time": "2020-0-15Ö00:00:00Q",
-        }
-        response = client.post(API_ENDPOINT, json=data)
-        assert response.status_code == 400
-        assert INVALID_TIME_FORMAT in response.json()["detail"]
-        data = {
-            "cart_value": 790,
-            "delivery_distance": 2235,
-            "number_of_items": 4,
-            "time": "0-01-15T13:00:00",
-        }
-        response = client.post(API_ENDPOINT, json=data)
-        assert response.status_code == 400
-        assert INVALID_TIME_FORMAT in response.json()["detail"]
-        data = {
-            "cart_value": 790,
-            "delivery_distance": 2235,
-            "number_of_items": 4,
-            "time": "2023-x-y5T13:00:00",
+            "time": time
         }
         response = client.post(API_ENDPOINT, json=data)
         assert response.status_code == 400
@@ -123,14 +114,54 @@ def test_valid_request():
     assert response.status_code == 200
     assert response.json() == expected_response
 
-
-def test_rush_hour():
+@pytest.mark.parametrize("time", [
+	"2024-01-26T17:00:45Z",
+    "2024-01-26T18:00:45+01:00",
+    "2024-01-26T19:00:45+02:00",
+    "2024-01-26T20:00:45+03:00",
+    "2024-01-26T21:00:45+04:00",
+    "2024-01-26T22:00:45+05:00",
+    "2024-01-26T23:00:45+06:00",
+    "2024-01-27T00:00:45+07:00",
+    "2024-01-27T01:00:45+08:00",
+    "2024-01-27T02:00:45+09:00",
+    "2024-01-27T03:00:45+10:00",
+    "2024-01-27T04:00:45+11:00",
+    "2024-01-27T05:00:45+12:00",
+    "2024-01-26T16:00:45-01:00",
+    "2024-01-26T15:00:45-02:00",
+    "2024-01-26T14:00:45-03:00",
+    "2024-01-26T13:00:45-04:00",
+    "2024-01-26T12:00:45-05:00",
+    "2024-01-26T11:00:45-06:00",
+    "2024-01-26T10:00:45-07:00",
+    "2024-01-26T09:00:45-08:00",
+    "2024-01-26T08:00:45-09:00",
+    "2024-01-26T07:00:45-10:00",
+    "2024-01-26T06:00:45-11:00",
+    "2024-01-26T05:00:45-12:00",
+    "2024-01-26T17:00:45.000Z",
+	"2024-01-26T17:00:45Z",
+	"2024-01-26T17:00:45+00",
+	"2024-01-26T17:00:45+0000",
+	"2024-01-26T17:00:45+00:00",
+	"2024-01-26T17:00:45.000+00",
+	"2024-01-26T17:00:45.000+0000",
+	"2024-01-26T17:00:45.000+00:00",
+	"2024-01-26T17:00:45-00",
+	"2024-01-26T17:00:45-0000",
+	"2024-01-26T17:00:45-00:00",
+	"2024-01-26T17:00:45.000-00",
+	"2024-01-26T17:00:45.001-0000",
+	"2024-01-26T17:00:45.090-00:00"
+])
+def test_rush_hour(time):
     with TestClient(app) as client:
         data = {
             "cart_value": 790,
             "delivery_distance": 2235,
             "number_of_items": 4,
-            "time": "2024-01-26T16:00:00Z",
+            "time": time,
         }
         expected_response = {"delivery_fee": 852}
         response = client.post(API_ENDPOINT, json=data)
@@ -151,6 +182,18 @@ def test_rush_hour_minimum_distance():
     assert response.status_code == 200
     assert response.json() == expected_response
 
+def test_rush_hour_minimum_distance_cart_surcharge():
+    with TestClient(app) as client:
+        data = {
+            "cart_value": 990,
+            "delivery_distance": 500,
+            "number_of_items": 4,
+            "time": "2024-01-26T16:00:00Z",
+        }
+        expected_response = {"delivery_fee": 252}
+        response = client.post(API_ENDPOINT, json=data)
+    assert response.status_code == 200
+    assert response.json() == expected_response
 
 def test_rush_hour_minimum_distance_5_items():
     with TestClient(app) as client:
