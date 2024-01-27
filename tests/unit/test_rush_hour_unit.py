@@ -10,7 +10,8 @@ from app.main import is_rush_hour
         "2024-01-26T14:59:59Z",  # one second before rush hour
     ],
 )
-def test_time_formats_not_rush_hour(time):
+def test_time_formats_not_rush_hour(time: str):
+    """Test that is_rush_hour does not return false positives."""
     assert not is_rush_hour(time)
 
 
@@ -26,7 +27,8 @@ def test_time_formats_not_rush_hour(time):
         "2024-01-26T18:59:59.999Z",  # right before rush hour ends
     ],
 )
-def test_time_zones_rush_hour(time):
+def test_time_zones_rush_hour(time: str):
+    """Test that is_rush_hour returns true, even a millisecond before it stops."""
     assert is_rush_hour(time)
 
 
@@ -60,7 +62,8 @@ def test_time_zones_rush_hour(time):
         "2024-01-22T05:00:45-12:00",
     ],
 )
-def test_all_time_zones_not_rush_hour(time):
+def test_all_timezones_not_rush_hour(time: str):
+    """Test is_rush_hour with all timezone offsets, ensure no false positives."""
     assert not is_rush_hour(time)
 
 
@@ -94,7 +97,8 @@ def test_all_time_zones_not_rush_hour(time):
         "2024-01-26T05:00:45-12:00",
     ],
 )
-def test_all_time_zones_rush_hour(time):
+def test_all_time_zones_rush_hour(time: str):
+    """Test is_rush_hour with all timezone offsets, ensure no false negatives."""
     assert is_rush_hour(time)
 
 
@@ -119,5 +123,6 @@ def test_all_time_zones_rush_hour(time):
         "2024-01-26T17:00:45.9-00:00",
     ],
 )
-def test_iso_format_rush_hour(time):
+def test_iso_format_rush_hour(time: str):
+    """Test is_rush_hour for false negatives, with various precision and timezone offset formats."""
     assert is_rush_hour(time)

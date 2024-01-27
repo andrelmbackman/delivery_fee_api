@@ -1,25 +1,28 @@
 import pytest
 from app.main import items_surcharge
-import app.constants as const
+import app.constants as constants
 
 
-@pytest.mark.parametrize("items", [0, 1, 2, 3, 4])
-def test_no_surcharge(items):
+@pytest.mark.parametrize("items", range(5))
+def test_no_surcharge(items: int):
+    """Test that the surcharge is 0 when the number of items is below 5."""
     assert items_surcharge(items) == 0
 
 
-@pytest.mark.parametrize("items", [5, 6, 7, 8, 9, 10, 11, 12])
-def test_no_bulk_fee(items):
-    expected_surcharge = (
-        items - const.MAX_ITEMS_NO_SURCHARGE
-    ) * const.ADDITIONAL_FEE_PER_ITEM
+@pytest.mark.parametrize("items", range(5, 13))
+def test_no_bulk_fee(items: int):
+    """Test that the surcharge per number of items over 5 is added."""
+    expected_surcharge: int = (
+        items - constants.MAX_ITEMS_NO_SURCHARGE
+    ) * constants.ADDITIONAL_FEE_PER_ITEM
     assert items_surcharge(items) == expected_surcharge
 
 
 @pytest.mark.parametrize("items", [13, 14, 15, 20, 50, 100, 1000])
-def test_bulk_fee(items):
-    expected_surcharge = (
-        items - const.MAX_ITEMS_NO_SURCHARGE
-    ) * const.ADDITIONAL_FEE_PER_ITEM
-    expected_surcharge += const.ITEMS_BULK_FEE
+def test_bulk_fee(items: int):
+    """Test that the surcharge for each item AND the bulk fee is added."""
+    expected_surcharge: int = (
+        items - constants.MAX_ITEMS_NO_SURCHARGE
+    ) * constants.ADDITIONAL_FEE_PER_ITEM
+    expected_surcharge += constants.ITEMS_BULK_FEE
     assert items_surcharge(items) == expected_surcharge
