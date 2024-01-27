@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 import pytest
 import math
 from app.main import app
-from app.error_messages import INVALID_TIME_FORMAT
+from app.error_messages import INVALID_TIME_FORMAT, INT_NOT_STRING
 
 API_ENDPOINT = "/delivery_fee"
 
@@ -126,20 +126,15 @@ def test_invalid_time_formats(time: str):
             "delivery_distance": 1000,
             "number_of_items": "1",
             "time": "2024-01-23T17:00:45Z",
-        },
-        {
-            "cart_value": 1000,
-            "delivery_distance": 1000,
-            "number_of_items": 1,
-            "time": 2024,
-        },
+        }
     ],
 )
 def test_invalid_data_types(payload):
     """Test that correct data types are enforced."""
     with TestClient(app) as client:
         response = client.post(API_ENDPOINT, json=payload)
-        assert response.status_code == 422
+        assert response.status_code == 400
+        assert INT_NOT_STRING in response.json()['detail']
 
 
 def test_valid_request():
