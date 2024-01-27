@@ -1,13 +1,13 @@
-""" Constants """
+"""Constants related to the full order"""
 MAX_DELIVERY_FEE = 1500
 FREE_DELIVERY_CART_VALUE = 20000
 NO_SURCHARGE_MIN_CART_VALUE = 1000
 RUSH_HOUR_MULTIPLIER = 1.2
-""" Distance constants """
+"""Constants related to the distance surcharge"""
 STARTING_DISTANCE = 1000
 DISTANCE_STARTING_FEE = 200
 DISTANCE_HALF_KM_FEE = 100
-""" Items constants """
+"""Constants related to the items surcharge"""
 MAX_ITEMS_NO_SURCHARGE = 4
 ADDITIONAL_FEE_PER_ITEM = 50
 MAX_ITEMS_NO_BULK_FEE = 12
