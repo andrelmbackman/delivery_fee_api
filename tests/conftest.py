@@ -1,7 +1,7 @@
 import os
 import sys
 
-# Configuration file to help pytest find the app module.
+"""Configuration file to help pytest find the app module."""
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
