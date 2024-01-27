@@ -1,9 +1,8 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from datetime import datetime, timezone
 from dateutil import parser
 import math
 from app.models import Order
-from app.validation import validate_order_data
 import app.constants as constants
 
 app = FastAPI(title="Delivery Fee API")
@@ -96,6 +95,6 @@ def is_rush_hour(time: str) -> bool:
 
 
 @app.post("/delivery_fee")
-def fee_calculator(order_data: Order = Depends(validate_order_data)):
+def fee_calculator(order_data: Order):
     fee: int = int(calculate_delivery_fee(order_data))
     return {"delivery_fee": fee}
