@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from fastapi import status
-from app.app import app
+from app.main import app
 from app.constants import ErrorMessages
 from tests.conftest import API_ENDPOINT
 
@@ -11,6 +11,23 @@ def test_empty_request_body():
     with TestClient(app) as client:
         response = client.post(API_ENDPOINT)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+def test_forbidden_request_types():
+    """Ensure that other request types than POST get a proper error response."""
+    with TestClient(app) as client:
+        response = client.get(API_ENDPOINT)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+        response = client.head(API_ENDPOINT)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+        response = client.put(API_ENDPOINT)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+        response = client.delete(API_ENDPOINT)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+        response = client.options(API_ENDPOINT)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+        response = client.patch(API_ENDPOINT)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
 @pytest.mark.parametrize("payload", [
