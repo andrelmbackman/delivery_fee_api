@@ -28,7 +28,6 @@ class Order(BaseModel):
     number_of_items: int = Field(strict=True, gt=0)
     time: str
 
-
     @field_validator("time")
     @classmethod
     def validate_iso_time_string(cls, time):
