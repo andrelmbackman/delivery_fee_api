@@ -1,8 +1,8 @@
+import pytest
 from fastapi.testclient import TestClient
 from fastapi import status
-import pytest
-from app.main import app
-from app.error_messages import INVALID_TIME_FORMAT
+from app.app import app
+from app.constants import ErrorMessages
 from tests.conftest import API_ENDPOINT
 
 
@@ -20,14 +20,14 @@ def test_empty_request_body():
     {"delivery_distance": 0, "time": "2024-01-26T16:00:00Z"},
 ])
 def test_invalid_request_body(payload):
-    """Ensure that incomplete request bodies cause an error response code."""
+    """Ensure that incomplete request bodies cause an error response."""
     with TestClient(app) as client:
         response = client.post(API_ENDPOINT, json=payload)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def test_invalid_keys():
-    """Test that incomplete keys raise an error response.."""
+    """Test that incomplete keys cause an error response.."""
     with TestClient(app) as client:
         payload = {
             "value": 790,
@@ -41,7 +41,7 @@ def test_invalid_keys():
 
 @pytest.mark.parametrize("value", [-1, -100, -999, -2147483648])
 def test_invalid_cart_value(value: int):
-    """Test that negative cart values raise an error response."""
+    """Test that negative cart values cause an error response."""
     with TestClient(app) as client:
         payload = {
             "cart_value": value,
@@ -55,7 +55,7 @@ def test_invalid_cart_value(value: int):
 
 @pytest.mark.parametrize("distance", [-1, -9, -99, -999, -99999999999999999999])
 def test_invalid_distance(distance: int):
-    """Test that negative distances raise an error response."""
+    """Test that negative distances cause an error response."""
     with TestClient(app) as client:
         payload = {
             "cart_value": 790,
@@ -69,7 +69,7 @@ def test_invalid_distance(distance: int):
 
 @pytest.mark.parametrize("items", [0, -9, -99, -999, -99999999999999999999])
 def test_invalid_items(items: int):
-    """Test that non-positive item numbers raise an error response."""
+    """Test that non-positive item numbers cause an error response."""
     with TestClient(app) as client:
         payload = {
             "cart_value": 790,
@@ -96,7 +96,7 @@ def test_invalid_items(items: int):
     ],
 )
 def test_invalid_time_formats(time: str):
-    """Test that invalid time formats raise an error response."""
+    """Test that invalid time formats cause an error response."""
     with TestClient(app) as client:
         payload = {
             "cart_value": 790,
@@ -106,7 +106,7 @@ def test_invalid_time_formats(time: str):
         }
         response = client.post(API_ENDPOINT, json=payload)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert INVALID_TIME_FORMAT in response.json()["detail"]
+        assert ErrorMessages.INVALID_TIME_FORMAT in response.json()["detail"]
 
 
 @pytest.mark.parametrize(

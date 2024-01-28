@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 from fastapi import status
 import pytest
 import math
-from app.main import app
+from app.app import app
 from tests.conftest import API_ENDPOINT
 
 
