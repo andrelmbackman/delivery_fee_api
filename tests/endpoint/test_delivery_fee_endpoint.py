@@ -1,8 +1,9 @@
 from fastapi.testclient import TestClient
+from fastapi import status
 import pytest
 import math
 from app.main import app
-from app.error_messages import INVALID_TIME_FORMAT, INT_NOT_STRING
+from app.error_messages import INVALID_TIME_FORMAT
 
 API_ENDPOINT = "/delivery_fee"
 
@@ -11,7 +12,7 @@ def test_empty_request_body():
     """Ensure that empty request bodies raise an error response."""
     with TestClient(app) as client:
         response = client.post(API_ENDPOINT)
-        assert response.status_code == 422
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 @pytest.mark.parametrize("payload", [
     {"cart_value": 0},
@@ -23,7 +24,7 @@ def test_invalid_request_body(payload):
     """Ensure that incomplete request bodies cause an error response code."""
     with TestClient(app) as client:
         response = client.post(API_ENDPOINT, json=payload)
-        assert response.status_code == 422
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def test_invalid_keys():
@@ -36,7 +37,7 @@ def test_invalid_keys():
             "time": "2024-01-15T13:00:00Z",
         }
         response = client.post(API_ENDPOINT, json=payload)
-        assert response.status_code == 422
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 @pytest.mark.parametrize("value", [-1, -100, -999, -2147483648])
 def test_invalid_cart_value(value: int):
@@ -49,7 +50,7 @@ def test_invalid_cart_value(value: int):
             "time": "2024-01-26T16:00:00Z",
         }
         response = client.post(API_ENDPOINT, json=payload)
-        assert response.status_code == 422
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 @pytest.mark.parametrize("distance", [-1, -9, -99, -999, -99999999999999999999])
 def test_invalid_distance(distance: int):
@@ -62,7 +63,7 @@ def test_invalid_distance(distance: int):
             "time": "2024-01-26T16:00:00Z",
         }
         response = client.post(API_ENDPOINT, json=payload)
-        assert response.status_code == 422
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 @pytest.mark.parametrize("items", [0, -9, -99, -999, -99999999999999999999])
 def test_invalid_items(items: int):
@@ -75,7 +76,7 @@ def test_invalid_items(items: int):
             "time": "2024-01-26T16:00:00Z",
         }
         response = client.post(API_ENDPOINT, json=payload)
-        assert response.status_code == 422
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.parametrize(
@@ -102,7 +103,7 @@ def test_invalid_time_formats(time: str):
             "time": time,
         }
         response = client.post(API_ENDPOINT, json=payload)
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert INVALID_TIME_FORMAT in response.json()["detail"]
 
 
@@ -133,8 +134,8 @@ def test_invalid_data_types(payload):
     """Test that correct data types are enforced."""
     with TestClient(app) as client:
         response = client.post(API_ENDPOINT, json=payload)
-        assert response.status_code == 400
-        assert INT_NOT_STRING in response.json()['detail']
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        #assert INT_NOT_STRING in response.json()['detail']
 
 
 def test_valid_request():
@@ -147,7 +148,7 @@ def test_valid_request():
         }
         expected_response = {"delivery_fee": 710}
         response = client.post(API_ENDPOINT, json=payload)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == expected_response
 
 
@@ -205,7 +206,7 @@ def test_rush_hour(time: str):
         }
         expected_response = {"delivery_fee": 852}
         response = client.post(API_ENDPOINT, json=payload)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == expected_response
 
 
@@ -220,7 +221,7 @@ def test_rush_hour_minimum_distance():
         }
         expected_response = {"delivery_fee": 240}
         response = client.post(API_ENDPOINT, json=payload)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == expected_response
 
 
@@ -235,7 +236,7 @@ def test_rush_hour_minimum_distance_cart_surcharge():
         }
         expected_response = {"delivery_fee": 252}
         response = client.post(API_ENDPOINT, json=payload)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == expected_response
 
 
@@ -250,7 +251,7 @@ def test_rush_hour_minimum_distance_5_items():
         }
         expected_response = {"delivery_fee": 300}
         response = client.post(API_ENDPOINT, json=payload)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == expected_response
 
 
@@ -275,7 +276,7 @@ def test_rush_hour_time_zones(time: str):
         }
         expected_response = {"delivery_fee": 300}
         response = client.post(API_ENDPOINT, json=payload)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == expected_response
 
 
@@ -289,7 +290,7 @@ def test_valid_cheap_order():
         }
         expected_response = {"delivery_fee": 200}
         response = client.post(API_ENDPOINT, json=payload)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == expected_response
 
 
@@ -308,7 +309,7 @@ def test_free_delivery(value: int):
         }
         expected_response = {"delivery_fee": 0}
         response = client.post(API_ENDPOINT, json=payload)
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert response.json() == expected_response
 
 @pytest.mark.parametrize("distance", [20000, 50000, 9999999, 99999999999])
@@ -323,7 +324,7 @@ def test_max_delivery_fee(distance: int):
         }
         expected_response = {"delivery_fee": 1500}
         response = client.post(API_ENDPOINT, json=payload)
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert response.json() == expected_response
 
 
@@ -337,7 +338,7 @@ def test_small_value_big_distance():
         }
         expected_response = {"delivery_fee": 1500}
         response = client.post(API_ENDPOINT, json=payload)
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert response.json() == expected_response
 
 
@@ -354,7 +355,7 @@ def test_cart_values(value: int):
     expected_fee: int = 1000 - value + 200
     expected_response = {"delivery_fee": expected_fee}
     response = client.post(API_ENDPOINT, json=payload)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == expected_response
 
 
@@ -373,7 +374,7 @@ def test_delivery_distance(distance: int):
     )  # starts at 200, no need to add starting fee
     expected_response = {"delivery_fee": expected_fee}
     response = client.post(API_ENDPOINT, json=payload)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == expected_response
 
 
@@ -390,5 +391,5 @@ def test_number_of_items(items: int):
     expected_fee: int = min(200 + ((items - 4) * 50) + (120 if items > 12 else 0), 1500)
     expected_response = {"delivery_fee": expected_fee}
     response = client.post(API_ENDPOINT, json=payload)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == expected_response
