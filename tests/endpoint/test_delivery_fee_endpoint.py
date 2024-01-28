@@ -2,7 +2,8 @@ from fastapi.testclient import TestClient
 from fastapi import status
 import pytest
 import math
-from app.app import app
+from app.main import app
+from app.constants import OrderConstants
 from tests.conftest import API_ENDPOINT
 
 
@@ -164,18 +165,37 @@ def test_delivery_distance(distance: int):
     assert response.json() == expected_response
 
 
+def calculate_expected_fee(items: int) -> int:
+    """
+    Helper function for test_number_of_items.
+    Calculate the expected delivery fee based on the number of items.
+
+    Args:
+        items (int): The number of items in the order.
+
+    Returns:
+        int: The expected delivery fee in cents.
+    """
+    starting_fee: int = OrderConstants.DISTANCE_STARTING_FEE
+    additional_items: int = max(items - OrderConstants.MAX_ITEMS_NO_SURCHARGE, 0)
+    item_surcharge: int = additional_items * OrderConstants.ADDITIONAL_FEE_PER_ITEM
+    bulk_fee = 120 if items > 12 else 0
+    return min(starting_fee + item_surcharge + bulk_fee, 1500)
+
+
 @pytest.mark.parametrize("items", range(5, 26, 1))
 def test_number_of_items(items: int):
     """Test the full range of the items surcharge."""
     client = TestClient(app)
     payload = {
         "cart_value": 1000,
-        "delivery_distance": 1000,
+        "delivery_distance": 500,
         "number_of_items": items,
         "time": "2024-01-23T23:00:00Z",
     }
-    expected_fee: int = min(200 + ((items - 4) * 50) + (120 if items > 12 else 0), 1500)
+    expected_fee: int = calculate_expected_fee(items)
     expected_response = {"delivery_fee": expected_fee}
     response = client.post(API_ENDPOINT, json=payload)
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == expected_response
+

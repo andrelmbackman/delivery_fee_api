@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 from fastapi import status
 import pytest
-from app.app import app
+from app.main import app
 from tests.conftest import API_ENDPOINT
 
 
