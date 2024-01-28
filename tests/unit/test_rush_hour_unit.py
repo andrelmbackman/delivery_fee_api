@@ -1,5 +1,5 @@
 import pytest
-from app.main import is_rush_hour
+from app.delivery_fee import is_rush_hour
 
 
 @pytest.mark.parametrize(
