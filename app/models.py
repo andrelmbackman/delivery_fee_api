@@ -25,7 +25,7 @@ class Order(BaseModel):
 
     cart_value: int = Field(strict=True, ge=0)
     delivery_distance: int = Field(strict=True, ge=0)
-    number_of_items: int = Field(strict=True, gt=0)
+    number_of_items: int = Field(strict=True, ge=1)
     time: str
 
     @field_validator("time")
