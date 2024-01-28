@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from datetime import datetime, timezone
 from dateutil import parser
 import math
-from app.models import Order
-import app.constants as constants
+from app.models import Order, DeliveryFeeResponse
+from app.constants import OrderConstants
 
 app = FastAPI(title="Delivery Fee API")
 
@@ -26,16 +26,18 @@ def calculate_delivery_fee(order_data: Order) -> float:
     - The delivery fee is capped at a maximum value.
     """
     fee: float = 0
-    if order_data.cart_value >= constants.FREE_DELIVERY_CART_VALUE:
+    if order_data.cart_value >= OrderConstants.FREE_DELIVERY_CART_VALUE:
         return 0
-    if order_data.cart_value < constants.NO_SURCHARGE_MIN_CART_VALUE:
-        fee = constants.NO_SURCHARGE_MIN_CART_VALUE - order_data.cart_value
-    fee += distance_surcharge(order_data.delivery_distance)
-    fee += items_surcharge(order_data.number_of_items)
+    if order_data.cart_value < OrderConstants.NO_SURCHARGE_MIN_CART_VALUE:
+        fee = OrderConstants.NO_SURCHARGE_MIN_CART_VALUE - order_data.cart_value
+
+    fee += distance_surcharge(order_data.delivery_distance) + items_surcharge(order_data.number_of_items)
+
     if is_rush_hour(order_data.time):
-        fee = fee * constants.RUSH_HOUR_MULTIPLIER
-    if fee > constants.MAX_DELIVERY_FEE:
-        return constants.MAX_DELIVERY_FEE
+        fee = fee * OrderConstants.RUSH_HOUR_MULTIPLIER
+    if fee > OrderConstants.MAX_DELIVERY_FEE:
+        return OrderConstants.MAX_DELIVERY_FEE
+
     return fee
 
 
@@ -52,10 +54,18 @@ def distance_surcharge(distance: int) -> int:
     The surcharge starts at 200 cents for the first 1000 meters.
     For every additional 500 meters started beyond the first 1000 meters, 100 cents are added.
     """
-    if distance <= constants.STARTING_DISTANCE:
-        return constants.DISTANCE_STARTING_FEE
-    half_kms_started = math.ceil((distance - constants.STARTING_DISTANCE) / 500)
-    return constants.DISTANCE_STARTING_FEE + (constants.DISTANCE_HALF_KM_FEE * half_kms_started)
+    starting_distance = OrderConstants.STARTING_DISTANCE
+    starting_fee = OrderConstants.DISTANCE_STARTING_FEE
+    half_km_fee = OrderConstants.DISTANCE_HALF_KM_FEE
+
+    if distance <= starting_distance:
+        return starting_fee
+
+    additional_distance = distance - starting_distance
+    half_kms_started = math.ceil(additional_distance / 500)
+    additional_surcharge = half_kms_started * half_km_fee
+
+    return starting_fee + additional_surcharge
 
 
 def items_surcharge(items: int) -> int:
@@ -73,10 +83,12 @@ def items_surcharge(items: int) -> int:
     - Additional 120 cents bulk fee for orders with more than 12 items.
     """
     fee = 0
-    if items > constants.MAX_ITEMS_NO_SURCHARGE:
-        fee = constants.ADDITIONAL_FEE_PER_ITEM * (items - constants.MAX_ITEMS_NO_SURCHARGE)
-    if items > constants.MAX_ITEMS_NO_BULK_FEE:
-        fee += constants.ITEMS_BULK_FEE
+    if items > OrderConstants.MAX_ITEMS_NO_SURCHARGE:
+        fee = OrderConstants.ADDITIONAL_FEE_PER_ITEM * (
+            items - OrderConstants.MAX_ITEMS_NO_SURCHARGE
+        )
+    if items > OrderConstants.MAX_ITEMS_NO_BULK_FEE:
+        fee += OrderConstants.ITEMS_BULK_FEE
     return fee
 
 
@@ -95,6 +107,6 @@ def is_rush_hour(time: str) -> bool:
 
 
 @app.post("/delivery_fee")
-def fee_calculator(order_data: Order):
+def fee_calculator(order_data: Order) -> DeliveryFeeResponse:
     fee: int = int(calculate_delivery_fee(order_data))
-    return {"delivery_fee": fee}
+    return DeliveryFeeResponse(delivery_fee=fee)

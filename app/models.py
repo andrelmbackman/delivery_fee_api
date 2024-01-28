@@ -1,7 +1,13 @@
-from fastapi import HTTPException
-from pydantic import BaseModel, PositiveInt, NonNegativeInt, field_validator
+from fastapi import HTTPException, status
+from pydantic import BaseModel, field_validator, Field
 from dateutil import parser
-import app.error_messages as error_messages
+from app.constants import ErrorMessages
+
+
+"""Error messages for raising HTTPException when receiving incorrect time formats."""
+invalid_utc_err: str = ErrorMessages.INVALID_UTC_OFFSET
+invalid_time_err: str = ErrorMessages.INVALID_TIME_FORMAT
+
 
 class Order(BaseModel):
     """
@@ -11,24 +17,17 @@ class Order(BaseModel):
     Model utilizes field_validator to ensure that the value is not a coerced string.
 
     Attributes:
-        cart_value (NonNegativeInt): The value of the shopping cart in cents.
-        delivery_distance (NonNegativeInt): The distance between the store and customer's location in meters.
-        number_of_items (PositiveInt): The number of items in the customer's shopping cart.
+        cart_value (int): The value of the shopping cart in cents.
+        delivery_distance (int): The distance between the store and customer's location in meters.
+        number_of_items (int): The number of items in the customer's shopping cart.
         time (str): Order time in ISO format.
     """
-    cart_value: NonNegativeInt
-    delivery_distance: NonNegativeInt
-    number_of_items: PositiveInt
+
+    cart_value: int = Field(strict=True, ge=0)
+    delivery_distance: int = Field(strict=True, ge=0)
+    number_of_items: int = Field(strict=True, gt=0)
     time: str
 
-    @field_validator(
-        "cart_value", "delivery_distance", "number_of_items", mode="before"
-    )
-    @classmethod
-    def validate_not_string(cls, value):
-        if isinstance(value, str):
-            raise HTTPException(status_code=400, detail=error_messages.INT_NOT_STRING)
-        return value
 
     @field_validator("time")
     @classmethod
@@ -37,7 +36,16 @@ class Order(BaseModel):
         try:
             parsed_time = parser.isoparse(time)
             if parsed_time.tzinfo is None and time[-1] != "Z":
-                raise HTTPException(status_code=400, detail=error_messages.INVALID_UTC_OFFSET)
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=invalid_utc_err
+                )
         except Exception as e:
-            raise HTTPException(status_code=400, detail=(error_messages.INVALID_TIME_FORMAT + str(e)))
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail=(invalid_time_err + str(e))
+            )
         return time
+
+
+class DeliveryFeeResponse(BaseModel):
+    """Model representing the response body."""
+    delivery_fee: int = Field(strict=True, ge=0)
