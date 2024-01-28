@@ -1,7 +1,11 @@
 import os
 import sys
 
+
 """Configuration file to help pytest find the app module."""
+
+
+API_ENDPOINT = "/delivery_fee"
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 

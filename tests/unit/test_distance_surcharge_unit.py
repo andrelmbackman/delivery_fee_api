@@ -2,6 +2,7 @@ import pytest
 from app.main import distance_surcharge
 from app.constants import DISTANCE_STARTING_FEE, DISTANCE_HALF_KM_FEE, STARTING_DISTANCE
 
+
 @pytest.mark.parametrize("distance", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 def test_low_distance(distance: int):
     """Test if the surcharge actually starts at the starting fee."""
