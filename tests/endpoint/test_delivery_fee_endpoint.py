@@ -198,4 +198,3 @@ def test_number_of_items(items: int):
     response = client.post(API_ENDPOINT, json=payload)
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == expected_response
-

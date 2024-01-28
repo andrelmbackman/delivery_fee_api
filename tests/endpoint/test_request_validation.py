@@ -18,24 +18,32 @@ def test_forbidden_request_types():
     with TestClient(app) as client:
         response = client.get(API_ENDPOINT)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
         response = client.head(API_ENDPOINT)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
         response = client.put(API_ENDPOINT)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
         response = client.delete(API_ENDPOINT)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
         response = client.options(API_ENDPOINT)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
         response = client.patch(API_ENDPOINT)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
-@pytest.mark.parametrize("payload", [
-    {"cart_value": 0},
-    {"cart_value": 0, "delivery_distance": 0},
-    {"delivery_distance": 0, "number_of_items": 1},
-    {"delivery_distance": 0, "time": "2024-01-26T16:00:00Z"},
-])
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"cart_value": 0},
+        {"cart_value": 0, "delivery_distance": 0},
+        {"delivery_distance": 0, "number_of_items": 1},
+        {"delivery_distance": 0, "time": "2024-01-26T16:00:00Z"},
+    ],
+)
 def test_invalid_request_body(payload):
     """Ensure that incomplete request bodies cause an error response."""
     with TestClient(app) as client:
@@ -146,7 +154,7 @@ def test_invalid_time_formats(time: str):
             "delivery_distance": 1000,
             "number_of_items": "1",
             "time": "2024-01-23T17:00:45Z",
-        }
+        },
     ],
 )
 def test_invalid_data_types(payload):

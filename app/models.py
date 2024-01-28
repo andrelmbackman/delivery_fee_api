@@ -40,11 +40,13 @@ class Order(BaseModel):
                 )
         except Exception as e:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail=(invalid_time_err + str(e))
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=(invalid_time_err + str(e)),
             )
         return time
 
 
 class DeliveryFeeResponse(BaseModel):
     """Model representing the response body."""
+
     delivery_fee: int = Field(strict=True, ge=0)

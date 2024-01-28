@@ -4,6 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class OrderConstants:
     """Constants related to the full order"""
+
     MAX_DELIVERY_FEE: int = 1500
     FREE_DELIVERY_CART_VALUE: int = 20000
     NO_SURCHARGE_MIN_CART_VALUE: int = 1000
@@ -24,5 +25,6 @@ class OrderConstants:
 @dataclass
 class ErrorMessages:
     """Error messages for raising HTTPExceptions and testing purposes"""
+
     INVALID_TIME_FORMAT: str = "Invalid time format: "
     INVALID_UTC_OFFSET: str = "Time string does not include timezone offset or 'Z'"

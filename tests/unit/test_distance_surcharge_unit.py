@@ -6,6 +6,7 @@ starting_fee: int = OrderConstants.DISTANCE_STARTING_FEE
 half_km_fee: int = OrderConstants.DISTANCE_HALF_KM_FEE
 starting_distance: int = OrderConstants.STARTING_DISTANCE
 
+
 @pytest.mark.parametrize("distance", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 def test_low_distance(distance: int):
     """Test if the surcharge actually starts at the starting fee."""
@@ -28,7 +29,5 @@ def test_starting_distance():
 def test_above_starting_distance(multiplier: int):
     """Validate that the right distance surcharge is added."""
     added_distance: int = starting_distance + (multiplier * 500)
-    expected_surcharge: int = starting_fee + (
-        multiplier * half_km_fee
-    )
+    expected_surcharge: int = starting_fee + (multiplier * half_km_fee)
     assert distance_surcharge(added_distance) == expected_surcharge
