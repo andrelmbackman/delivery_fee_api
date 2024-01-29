@@ -1,9 +1,9 @@
 # Delivery Fee Calculator API
 
-### This is my solution to [Wolt's engineering internship (backend) assignment](https://github.com/woltapp/engineering-internship-2024)
+### Solution to [Wolt's engineering internship (backend) assignment](https://github.com/woltapp/engineering-internship-2024)
 ## Description
-- The delivery fee calculator is a single-endpoint API that responds to POST-requests.
-- The request body should look like:
+- The Delivery Fee Calculator API provides a single-endpoint that responds to POST requests.
+- Request body format:
 ```json
 {"cart_value": 790, "delivery_distance": 2235, "number_of_items": 4, "time": "2024-01-15T13:00:00Z"}
 ```
@@ -16,12 +16,12 @@
 |number_of_items    |Integer|The __number of items__ in the customer's shopping cart.                   |__4__ (customer has 4 items in the cart)   |
 |time               |String |Order time in UTC in [ISO format](https://en.wikipedia.org/wiki/ISO_8601). |__2024-01-15T13:00:00Z__                   |
 
-- The response will be the calculated delivery fee:
+- Response: Calculated delivery fee
 ```json
 {"delivery_fee": 710}
 ```
 ## Usage
-### The simplest way is using a virtual environment (python 3.10 or higher):
+### Using a virtual environment (Python 3.10 or higher):
 #### Linux, MacOS:
 ```bash 
 python3 -m venv .venv
@@ -30,24 +30,70 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 #### Windows:
-- same, but replace ```source .venv/bin/activate```  
-with ```.venv/Scripts/Activate.ps1``` (PowerShell)
-or ```.venv/Scripts/activate.bat``` (CMD)
+
+<table>
+  <tr>
+    <td>
+      <strong>PowerShell</strong>
+    </td>
+    <td>
+      <strong>CMD</strong>
+    </td>
+  </tr>
+  <tr>
+  <td>
+
+```bash
+python3 -m venv .venv  
+.venv/Scripts/Activate.ps1  
+pip install -r requirements.txt  
+uvicorn app.main:app --reload  
+```
+
+</td>
+<td>
+
+```bash
+python3 -m venv .venv  
+.venv/Scripts/activate.bat  
+pip install -r requirements.txt  
+uvicorn app.main:app --reload  
+```
+
+</td>
+</tr>
+</table>
 
 #### To exit the virtual environment:
 ```deactivate```
 
 ## Try it out:
-- send post requests to ```127.0.0.1:8000/delivery_fee``` 
-- alternative address: ```localhost:8000/delivery_fee```
-- in a browser: https://127.0.0.1:8000/docs shows fastAPI's documentation and lets you try it out
-- send a post request from terminal:
+- Send POST requests to ```127.0.0.1:8000/delivery_fee``` or ```localhost:8000/delivery_fee```
+- Access fastAPI's documentation and test the API: https://127.0.0.1:8000/docs
+- Send a POST request from terminal:
 ```
 curl -X "POST" -H "Content-Type: application/json" -d "{\"cart_value\": 790, \"delivery_distance\": 2235, \"number_of_items\": 4, \"time\": \"2024-01-15T13:00:00Z\"}" localhost:8000/delivery_fee
 ```
-### to run the tests:
-```pytest```
-- The test cases can be found in /tests/delivery_fee_tests.py
+## Running the tests
+<table>
+  <tr>
+    <th>Tests</th>
+    <th>Commands</th>
+  </tr>
+  <tr>
+    <td>All tests:</td>
+    <td><code>pytest</code></td>
+  </tr>
+  <tr>
+    <td>Unit tests:</td>
+    <td><code>pytest tests/unit</code></td>
+  </tr>
+  <tr>
+    <td>Endpoint tests:</td>
+    <td><code>pytest tests/endpoint</code></td>
+  </tr>
+</table>
+
 ## Requirements
 (No need to worry about these if you created a virtual environment)
 ```
