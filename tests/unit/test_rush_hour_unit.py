@@ -126,3 +126,15 @@ def test_all_time_zones_rush_hour(time: str):
 def test_iso_format_rush_hour(time: str):
     """Test is_rush_hour for false negatives, with various precision and timezone offset formats."""
     assert is_rush_hour(time)
+
+
+@pytest.mark.parametrize(
+    "time",
+    [
+        "24-01-24T12:30:45Z",
+        "2024-01-26T33",
+        "2024-99-99T14:59:59Z",
+    ],
+)
+def test_invalid_time_returns_false(time: str):
+    assert not is_rush_hour(time)
