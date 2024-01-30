@@ -13,8 +13,7 @@ class Order(BaseModel):
     """
     Class (model) representing an order, the request body must follow this format.
     By default, extra fields are not forbidden, but disregarded. Pydantic handles the
-    input validation by utilizing PositiveInt and NonNegativeInt data types.
-    Model utilizes field_validator to ensure that the value is not a coerced string.
+    input validation by utilizing strict mode.
 
     Attributes:
         cart_value (int): The value of the shopping cart in cents.

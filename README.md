@@ -69,7 +69,7 @@ uvicorn app.main:app --reload
 
 ## Try it out:
 - Send POST requests to ```127.0.0.1:8000/delivery_fee``` or ```localhost:8000/delivery_fee```
-- Access fastAPI's documentation and test the API: https://127.0.0.1:8000/docs
+- Access fastAPI's documentation and interact with the API: https://127.0.0.1:8000/docs
 - Send a POST request from terminal:
 ```
 curl -X "POST" -H "Content-Type: application/json" -d "{\"cart_value\": 790, \"delivery_distance\": 2235, \"number_of_items\": 4, \"time\": \"2024-01-15T13:00:00Z\"}" localhost:8000/delivery_fee
