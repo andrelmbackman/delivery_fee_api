@@ -7,8 +7,10 @@ class OrderConstants:
 
     MAX_DELIVERY_FEE: int = 1500
     FREE_DELIVERY_CART_VALUE: int = 20000
-    MIN_CART_VALUE_NO_SURCHARGE: int = 1000
     RUSH_HOUR_MULTIPLIER: float = 1.2
+
+    """If the cart value is less than this, the difference is added as a surcharge."""
+    MIN_CART_VALUE_NO_SURCHARGE: int = 1000
 
     """Constants related to the distance surcharge"""
     STARTING_DISTANCE: int = 1000
