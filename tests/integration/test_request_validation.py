@@ -109,6 +109,7 @@ def test_invalid_items(items: int):
 @pytest.mark.parametrize(
     "time",
     [
+        "2024-01-26T16:00:00", # no 'Z'
         "24-01-26T17:00:45Z",
         "9999-99-99T17:00:45Z",
         "2024-01-01T99:99:99.999Z",
@@ -118,6 +119,8 @@ def test_invalid_items(items: int):
         "2024-01-26T17:00:45+00Z",
         "2024-01-26T17:00:45-00Z",
         "2024-01-26T17:00",
+        "24-01-26T16:30:45Z",
+        "2024-01-2616:00:00Z"
     ],
 )
 def test_invalid_time_formats(time: str):
