@@ -27,12 +27,9 @@ def calculate_delivery_fee(order_data: Order) -> int:
     if order_data.cart_value >= OrderConstants.FREE_DELIVERY_CART_VALUE:
         return 0
 
-    if order_data.cart_value < OrderConstants.NO_SURCHARGE_MIN_CART_VALUE:
-        fee = OrderConstants.NO_SURCHARGE_MIN_CART_VALUE - order_data.cart_value
-
-    fee += distance_surcharge(order_data.delivery_distance) + items_surcharge(
-        order_data.number_of_items
-    )
+    fee += cart_value_surcharge(order_data.cart_value)
+    fee += distance_surcharge(order_data.delivery_distance)
+    fee += items_surcharge(order_data.number_of_items)
 
     if is_rush_hour(order_data.time):
         fee = int(fee * OrderConstants.RUSH_HOUR_MULTIPLIER)
@@ -41,6 +38,15 @@ def calculate_delivery_fee(order_data: Order) -> int:
         return OrderConstants.MAX_DELIVERY_FEE
 
     return fee
+
+
+def cart_value_surcharge(chart_value: int) -> int:
+    """
+    Return 0 if the chart_value is higher or equal to 1000 (10€),
+    otherwise return the difference so they add up to 1000.
+    """
+    min_chart_value: int = OrderConstants.MIN_CART_VALUE_NO_SURCHARGE
+    return max(0, min_chart_value - chart_value)
 
 
 def distance_surcharge(distance: int) -> int:
