@@ -123,16 +123,7 @@ types-python-dateutil==2.8.19.20240106
 - Rush hour in UTC: although it does not make much sense in a real-life scenario, I interpreted it as any timezone converted to UTC; rush hour in UTC, no matter the local time of the order.
 - Rush hour 3-7 PM was interpreted as 15:00:00.000 – 18:59:59.999.
 - As stated in the docstrings of models.py: extra fields of the request body do not raise errors, but are disregarded. This is true only if the required fields are present and formatted correctly.
-- Rounding; if the rush hour multiplication results in a fractional number, for instance:
-```json
-{
-  "cart_value": 792,
-  "delivery_distance": 500,
-  "number_of_items": 1,
-  "time": "2024-01-26T17:00:00Z"
-}
-```
-  - the real price would be 489,6. The fraction is removed, and this implementation's delivery fee will be 489. One cent has to go somewhere, in my case, it is always to the customer.
+- Rounding; in cases where the rush hour multiplication results in a fractional number, banker's rounding is applied.
 ---
 #### Special thanks to [Jerry Pussinen](https://github.com/jerry-git) for the inspiring FastAPI workshop at Hive Helsinki!
   
