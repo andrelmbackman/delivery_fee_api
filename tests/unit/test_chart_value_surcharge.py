@@ -33,4 +33,5 @@ def test_med_cart_value(value: int):
 @pytest.mark.parametrize("value", range(1000, 100000, 1000))
 def test_high_cart_value(value: int):
     """Test the surcharge calculation for a high chart value."""
-    assert cart_value_surcharge(value) == 0
+    expected_surcharge: int = max(0, min_chart_value - value)
+    assert cart_value_surcharge(value) == expected_surcharge
