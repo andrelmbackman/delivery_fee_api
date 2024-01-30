@@ -6,8 +6,10 @@ from app.delivery_fee import is_rush_hour
     "time",
     [
         "2024-01-24T12:30:45Z",
-        "2024-01-26T19:00:01Z",  # one second after rush hour
-        "2024-01-26T14:59:59Z",  # one second before rush hour
+        "2024-01-26T19:00:01.000Z", # one second after rush hour
+        "2024-01-26T19:00:00.000Z", # one millisecond after rush hour
+        "2024-01-26T14:59:59.000Z", # one second before rush hour
+        "2024-01-26T14:59:59.999Z", # one millisecond before rush hour
     ],
 )
 def test_time_formats_not_rush_hour(time: str):
