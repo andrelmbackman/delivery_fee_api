@@ -89,8 +89,12 @@ curl -X "POST" -H "Content-Type: application/json" -d "{\"cart_value\": 790, \"d
     <td><code>pytest tests/unit</code></td>
   </tr>
   <tr>
-    <td>Endpoint tests:</td>
-    <td><code>pytest tests/endpoint</code></td>
+    <td>Integration tests:</td>
+    <td><code>pytest tests/integration</code></td>
+  </tr>
+  <tr>
+    <td>Show coverage:</td>
+    <td><code>pytest --cov=.</code></td>
   </tr>
 </table>
 
