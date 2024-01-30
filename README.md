@@ -7,7 +7,7 @@
 ```json
 {"cart_value": 790, "delivery_distance": 2235, "number_of_items": 4, "time": "2024-01-15T13:00:00Z"}
 ```
-##### Field details
+#### Field details:
 
 | Field             | Type  | Description                                                               | Example value                             |
 |:---               |:---   |:---                                                                       |:---                                       |
@@ -16,13 +16,15 @@
 |number_of_items    |Integer|The __number of items__ in the customer's shopping cart.                   |__4__ (customer has 4 items in the cart)   |
 |time               |String |Order time in UTC in [ISO format](https://en.wikipedia.org/wiki/ISO_8601). |__2024-01-15T13:00:00Z__                   |
 
-- Response: Calculated delivery fee
+#### Response: Calculated delivery fee
 ```json
 {"delivery_fee": 710}
 ```
-## Usage
+---
+
+## Getting started
 ### Using a virtual environment (Python 3.10 or higher):
-#### Linux, MacOS:
+#### Linux, macOS:
 ```bash 
 python3 -m venv .venv
 source .venv/bin/activate
@@ -67,6 +69,13 @@ uvicorn app.main:app --reload
 #### To exit the virtual environment:
 ```deactivate```
 
+### Using Docker:
+#### Prerequisites
+- Docker and docker-compose installed on your system.
+#### Build and Run Docker Container
+```docker compose up``` or ```docker-compose up```
+
+---
 ## Try it out:
 - Send POST requests to ```127.0.0.1:8000/delivery_fee``` or ```localhost:8000/delivery_fee```
 - Access fastAPI's documentation and interact with the API: https://127.0.0.1:8000/docs
@@ -105,10 +114,26 @@ fastapi==0.109.0
 httpx==0.26.0
 pydantic==2.5.3
 pytest==7.4.4
+pytest-cov==4.1.0
 uvicorn==0.27.0
 python-dateutil==2.8.2
 types-python-dateutil==2.8.19.20240106
 ```
-#### Special thanks to [Jerry Pussinen](https://github.com/jerry-git) for the inspiring FastAPI workshop!
+## Clarifications/interpretations
+- Rush hour in UTC: although it does not make much sense in a real-life scenario, I interpreted it as any timezone converted to UTC; rush hour in UTC, no matter the local time of the order.
+- Rush hour 3-7 PM was interpreted as 15:00:00.000 – 18:59:59.999.
+- As stated in the docstrings of models.py: extra fields of the request body do not raise errors, but are disregarded. This is true only if the required fields are present and formatted correctly.
+- Rounding; if the rush hour multiplication results in a fractional number, for instance:
+```json
+{
+  "cart_value": 792,
+  "delivery_distance": 500,
+  "number_of_items": 1,
+  "time": "2024-01-26T17:00:00Z"
+}
+```
+  - the real price would be 489,6. The fraction is removed, and this implementation's delivery fee will be 489. One cent has to go somewhere, in my case, it is always to the customer.
+---
+#### Special thanks to [Jerry Pussinen](https://github.com/jerry-git) for the inspiring FastAPI workshop at Hive Helsinki!
   
   
