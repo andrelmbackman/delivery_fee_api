@@ -3,12 +3,12 @@ from dataclasses import dataclass
 
 @dataclass
 class OrderConstants:
-    """Constants related to the full order"""
-
+    """The delivery fee can never surpass this."""
     MAX_DELIVERY_FEE: int = 1500
+    """Free delivery is granted when the chart value reaches this."""
     FREE_DELIVERY_CART_VALUE: int = 20000
+    """The delivery fee is multiplied by this if the order is placed during rush hours."""
     RUSH_HOUR_MULTIPLIER: float = 1.2
-
     """If the cart value is less than this, the difference is added as a surcharge."""
     MIN_CART_VALUE_NO_SURCHARGE: int = 1000
 
@@ -23,6 +23,12 @@ class OrderConstants:
     MAX_ITEMS_NO_BULK_FEE: int = 12
     ITEMS_BULK_FEE: int = 120
 
+    """Rush hour day is 4, Friday (count starts from 0)"""
+    RUSH_HOUR_DAY: int = 4
+    """The starting hour: 15:00:00"""
+    RUSH_HOUR_START: int = 15
+    """Rush hour ends at 19:00:00"""
+    RUSH_HOUR_END: int = 19
 
 @dataclass
 class ErrorMessages:
