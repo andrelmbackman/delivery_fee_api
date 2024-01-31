@@ -5,21 +5,22 @@
 - The Delivery Fee Calculator API provides a single-endpoint that responds to POST requests.
 - Request body format:
 ```json
-{"cart_value": 790, "delivery_distance": 2235, "number_of_items": 4, "time": "2024-01-15T13:00:00Z"}
+{"cart_value": 975, "delivery_distance": 3520, "number_of_items": 3, "time": "2024-01-31T17:00:00Z"}
 ```
 #### Field details:
 
 | Field             | Type  | Description                                                               | Example value                             |
 |:---               |:---   |:---                                                                       |:---                                       |
-|cart_value         |Integer|Value of the shopping cart __in cents__.                                   |__790__ (790 cents = 7.90€)                |
-|delivery_distance  |Integer|The distance between the store and customer’s location __in meters__.      |__2235__ (2235 meters = 2.235 km)          |
-|number_of_items    |Integer|The __number of items__ in the customer's shopping cart.                   |__4__ (customer has 4 items in the cart)   |
-|time               |String |Order time in UTC in [ISO format](https://en.wikipedia.org/wiki/ISO_8601). |__2024-01-15T13:00:00Z__                   |
+|cart_value         |Integer|Value of the shopping cart __in cents__.                                   |__975__ (975 cents = 9.75€)                |
+|delivery_distance  |Integer|The distance between the store and customer’s location __in meters__.      |__3520__ (3520 meters = 3.520 km)          |
+|number_of_items    |Integer|The __number of items__ in the customer's shopping cart.                   |__3__ (customer has 3 items in the cart)   |
+|time               |String |Order time in UTC in [ISO format](https://en.wikipedia.org/wiki/ISO_8601). |__2024-01-31T17:00:00Z__                   |
 
-#### Response: Calculated delivery fee
+#### Response: Calculated delivery fee (in cents)
 ```json
-{"delivery_fee": 710}
+{"delivery_fee": 825}
 ```
+- delivery fee will be 8.25€ (825 cents)
 ---
 
 ## Getting started
