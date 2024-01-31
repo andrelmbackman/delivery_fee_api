@@ -76,6 +76,7 @@ def test_invalid_cart_value(value: int):
         }
         response = client.post(API_ENDPOINT, json=payload)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert any("cart_value" in error["loc"] for error in response.json()["detail"])
 
 
 @pytest.mark.parametrize("distance", [-1, -9, -99, -999, -99999999999999999999])
@@ -90,6 +91,7 @@ def test_invalid_distance(distance: int):
         }
         response = client.post(API_ENDPOINT, json=payload)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert any("delivery_distance" in error["loc"] for error in response.json()["detail"])
 
 
 @pytest.mark.parametrize("items", [0, -9, -99, -999, -99999999999999999999])
@@ -104,6 +106,7 @@ def test_invalid_items(items: int):
         }
         response = client.post(API_ENDPOINT, json=payload)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert any("number_of_items" in error["loc"] for error in response.json()["detail"])
 
 
 @pytest.mark.parametrize(
@@ -161,7 +164,11 @@ def test_invalid_time_formats(time: str):
     ],
 )
 def test_invalid_data_types(payload):
-    """Test that correct data types are enforced."""
+    """
+    Test that correct data types are enforced, and that the error response body
+    mentions the correct data type.
+    """
     with TestClient(app) as client:
         response = client.post(API_ENDPOINT, json=payload)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert any("integer" in error["msg"] for error in response.json()["detail"])
