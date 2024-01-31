@@ -6,8 +6,7 @@ from app.constants import OrderConstants
 
 
 def calculate_delivery_fee(order_data: Order) -> int:
-    """
-    Calculate the full delivery fee of the order.
+    """Calculate the full delivery fee of the order.
 
     Args:
         order_data (Order): The order details including cart value, delivery distance, number of items, and order time.
@@ -42,8 +41,7 @@ def calculate_delivery_fee(order_data: Order) -> int:
 
 
 def cart_value_surcharge(chart_value: int) -> int:
-    """
-    Return 0 if the chart_value is higher or equal to 1000 (10€),
+    """Return 0 if the chart_value is higher or equal to 1000 (10€),
     otherwise return the difference so they add up to 1000.
     """
     min_chart_value: int = OrderConstants.MIN_CART_VALUE_NO_SURCHARGE
@@ -51,8 +49,7 @@ def cart_value_surcharge(chart_value: int) -> int:
 
 
 def distance_surcharge(distance: int) -> int:
-    """
-    Calculate the delivery surcharge based on the given distance (in meters).
+    """Calculate the delivery surcharge based on the given distance (in meters).
 
     Args:
         distance (int): The delivery distance in meters.
@@ -78,8 +75,7 @@ def distance_surcharge(distance: int) -> int:
 
 
 def items_surcharge(items: int) -> int:
-    """
-    Calculate the surcharge and bulk fee based on the number of items.
+    """Calculate the surcharge and bulk fee based on the number of items.
 
     Args:
         items (int): The number of items in the order.
@@ -102,10 +98,19 @@ def items_surcharge(items: int) -> int:
 
 
 def is_rush_hour(time: str) -> bool:
-    """
-    Determine whether or not the order was placed during rush hour (Friday 3-7PM UTC),
-    timezone offset considered. Exception should never be raised, since the field has
-    been validated, but we don't want to add a rush hour fee if anything unexpected happens.
+    """Determines whether an order was placed during rush hour (Friday 3-7 PM UTC).
+
+    Args:
+        time (str): The ISO 8601 formatted time string representing the order placement time.
+
+    Returns:
+        bool: True if the order was placed during rush hour, False otherwise.
+
+    Note:
+        The rush hour is defined as Friday between 3:00 PM (inclusive) and 7:00 PM (exclusive) in UTC.
+        The timezone offset is considered during the evaluation.
+        No exceptions should be raised during the execution, as the input is assumed to be validated.
+        If any unexpected error occurs, the function returns False to avoid applying a rush hour fee incorrectly.
     """
     rush_day: int = OrderConstants.RUSH_HOUR_DAY
     rush_start: int = OrderConstants.RUSH_HOUR_START

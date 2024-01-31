@@ -10,8 +10,7 @@ invalid_time_err: str = ErrorMessages.INVALID_TIME_FORMAT
 
 
 class Order(BaseModel):
-    """
-    Class (model) representing an order, the request body must follow this format.
+    """Class (model) representing an order, the request body must follow this format.
     By default, extra fields are not forbidden, but disregarded. Pydantic handles the
     input validation by utilizing strict mode.
 

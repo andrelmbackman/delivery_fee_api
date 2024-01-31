@@ -3,7 +3,11 @@ from dataclasses import dataclass
 
 @dataclass
 class OrderConstants:
-    """The delivery fee can never surpass this."""
+    """Dataclass containing constants that make up the rules for calculating
+    the delivery fee.
+    """
+
+    """The delivery fee can never exceed this."""
     MAX_DELIVERY_FEE: int = 1500
     """Free delivery is granted when the chart value reaches this."""
     FREE_DELIVERY_CART_VALUE: int = 20000
@@ -29,6 +33,7 @@ class OrderConstants:
     RUSH_HOUR_START: int = 15
     """Rush hour ends at 19:00:00"""
     RUSH_HOUR_END: int = 19
+
 
 @dataclass
 class ErrorMessages:
