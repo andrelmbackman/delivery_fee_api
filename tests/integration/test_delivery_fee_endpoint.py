@@ -82,8 +82,7 @@ def test_valid_cheap_order():
 
 @pytest.mark.parametrize("value", [20000, 50000, 100000, 9999999])
 def test_free_delivery(value: int):
-    """
-    Make sure that the delivery fee is 0 when cart_value exceeds 20000.
+    """Test if the delivery fee is 0 when cart_value exceeds 20000.
     Items surcharge, bulk fees, rush hour, delivery distance disregarded.
     """
     with TestClient(app) as client:
@@ -146,7 +145,7 @@ def test_cart_values(value: int):
     assert response.json() == expected_response
 
 
-@pytest.mark.parametrize("distance", range(501, 7002, 500))
+@pytest.mark.parametrize("distance", range(501, 8002, 500))
 def test_delivery_distance(distance: int):
     """Test full range of delivery distance fee."""
     client = TestClient(app)
@@ -156,9 +155,7 @@ def test_delivery_distance(distance: int):
         "number_of_items": 4,
         "time": "2024-01-23T23:00:00Z",
     }
-    expected_fee: int = 100 * math.ceil(
-        distance / 500
-    )  # starts at 200, no need to add starting fee
+    expected_fee: int = min(100 * math.ceil(distance / 500), 1500)
     expected_response = {"delivery_fee": expected_fee}
     response = client.post(API_ENDPOINT, json=payload)
     assert response.status_code == status.HTTP_200_OK
@@ -183,7 +180,7 @@ def calculate_expected_fee(items: int) -> int:
     return min(starting_fee + item_surcharge + bulk_fee, 1500)
 
 
-@pytest.mark.parametrize("items", range(5, 26, 1))
+@pytest.mark.parametrize("items", range(5, 29, 1))
 def test_number_of_items(items: int):
     """Test the full range of the items surcharge."""
     client = TestClient(app)

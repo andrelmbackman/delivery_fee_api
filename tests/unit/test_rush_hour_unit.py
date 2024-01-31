@@ -6,10 +6,10 @@ from app.delivery_fee import is_rush_hour
     "time",
     [
         "2024-01-24T12:30:45Z",
-        "2024-01-26T19:00:01.000Z", # one second after rush hour
-        "2024-01-26T19:00:00.000Z", # one millisecond after rush hour
-        "2024-01-26T14:59:59.000Z", # one second before rush hour
-        "2024-01-26T14:59:59.999Z", # one millisecond before rush hour
+        "2024-01-26T19:00:01.000Z",  # one second after rush hour
+        "2024-01-26T19:00:00.000Z",  # one millisecond after rush hour
+        "2024-01-26T14:59:59.000Z",  # one second before rush hour
+        "2024-01-26T14:59:59.999Z",  # one millisecond before rush hour
     ],
 )
 def test_time_formats_not_rush_hour(time: str):
@@ -136,12 +136,13 @@ def test_iso_format_rush_hour(time: str):
         "24-01-26T16:30:45Z",
         "2024-01-26T16:00:99",
         "2024-01-2616:00:00Z",
-        "2024-99-99T14:59:59Z"
+        "2024-99-99T14:59:59Z",
     ],
 )
 def test_invalid_time_returns_false(time: str):
     """Test if is_rush_hour returns false when the argument is invalid."""
     assert not is_rush_hour(time)
+
 
 def test_none_time_returns_false():
     assert not is_rush_hour(None)

@@ -91,7 +91,9 @@ def test_invalid_distance(distance: int):
         }
         response = client.post(API_ENDPOINT, json=payload)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert any("delivery_distance" in error["loc"] for error in response.json()["detail"])
+        assert any(
+            "delivery_distance" in error["loc"] for error in response.json()["detail"]
+        )
 
 
 @pytest.mark.parametrize("items", [0, -9, -99, -999, -99999999999999999999])
@@ -106,13 +108,15 @@ def test_invalid_items(items: int):
         }
         response = client.post(API_ENDPOINT, json=payload)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert any("number_of_items" in error["loc"] for error in response.json()["detail"])
+        assert any(
+            "number_of_items" in error["loc"] for error in response.json()["detail"]
+        )
 
 
 @pytest.mark.parametrize(
     "time",
     [
-        "2024-01-26T16:00:00", # no 'Z'
+        "2024-01-26T16:00:00",  # no 'Z'
         "24-01-26T17:00:45Z",
         "9999-99-99T17:00:45Z",
         "2024-01-01T99:99:99.999Z",
@@ -123,7 +127,7 @@ def test_invalid_items(items: int):
         "2024-01-26T17:00:45-00Z",
         "2024-01-26T17:00",
         "24-01-26T16:30:45Z",
-        "2024-01-2616:00:00Z"
+        "2024-01-2616:00:00Z",
     ],
 )
 def test_invalid_time_formats(time: str):

@@ -19,7 +19,7 @@ def test_round_down_dot_two():
             "number_of_items": 4,
             "time": "2024-01-26T17:00:00Z",
         }
-        expected_response = {"delivery_fee": 241} # 241.2
+        expected_response = {"delivery_fee": 241}  # 241.2
         response = client.post(API_ENDPOINT, json=payload)
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == expected_response
@@ -34,7 +34,7 @@ def test_round_down_dot_four():
             "number_of_items": 4,
             "time": "2024-01-26T17:00:00Z",
         }
-        expected_response = {"delivery_fee": 242} # 242.4
+        expected_response = {"delivery_fee": 242}  # 242.4
         response = client.post(API_ENDPOINT, json=payload)
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == expected_response
@@ -49,14 +49,14 @@ def test_round_up_dot_six():
             "number_of_items": 4,
             "time": "2024-01-26T17:00:00Z",
         }
-        expected_response = {"delivery_fee": 244} # 243.6
+        expected_response = {"delivery_fee": 244}  # 243.6
         response = client.post(API_ENDPOINT, json=payload)
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == expected_response
 
 
 def test_round_up_dot_eight():
-    """"Test rounding up for a fractional value ending in .8"""
+    """ "Test rounding up for a fractional value ending in .8"""
     with TestClient(app) as client:
         payload = {
             "cart_value": 996,
@@ -64,7 +64,7 @@ def test_round_up_dot_eight():
             "number_of_items": 4,
             "time": "2024-01-26T17:00:00Z",
         }
-        expected_response = {"delivery_fee": 245} # 244.8
+        expected_response = {"delivery_fee": 245}  # 244.8
         response = client.post(API_ENDPOINT, json=payload)
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == expected_response
