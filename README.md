@@ -82,7 +82,7 @@ uvicorn app.main:app --reload
 - Access fastAPI's documentation and interact with the API: https://127.0.0.1:8000/docs
 - Send a POST request from terminal:
 ```
-curl -X "POST" -H "Content-Type: application/json" -d "{\"cart_value\": 790, \"delivery_distance\": 2235, \"number_of_items\": 4, \"time\": \"2024-01-15T13:00:00Z\"}" localhost:8000/delivery_fee
+curl -X "POST" -H "Content-Type: application/json" -d "{\"cart_value\": 975, \"delivery_distance\": 3520, \"number_of_items\": 3, \"time\": \"2024-01-31T17:00:00Z\"}" localhost:8000/delivery_fee
 ```
 ## Running the tests
 <table>
@@ -121,8 +121,8 @@ python-dateutil==2.8.2
 types-python-dateutil==2.8.19.20240106
 ```
 ## Clarifications/interpretations
-- Rush hour in UTC: although it does not make much sense in a real-life scenario, I interpreted it as any timezone converted to UTC; rush hour in UTC, no matter the local time of the order.
-- Rush hour 3-7 PM was interpreted as 15:00:00.000 – 18:59:59.999.
+- Rush hour in UTC: although it does not make much sense in a real-life scenario, I interpret it as any timezone converted to UTC; rush hour in UTC, no matter the local time of the order.
+- Rush hour 3-7 PM is interpreted as 15:00:00.000 – 18:59:59.999 (3 inclusive, 7 exclusive).
 - As stated in the docstrings of models.py: extra fields of the request body do not raise errors, but are disregarded. This is true only if the required fields are present and formatted correctly.
 - Rounding; in cases where the rush hour multiplication results in a fractional number, banker's rounding is applied.
 ---
