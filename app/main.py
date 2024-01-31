@@ -20,6 +20,14 @@ def fee_calculator(order_data: Order) -> DeliveryFeeResponse:
     This endpoint calculates the delivery fee for an order based on the provided order data.
     The fee is computed using the calculate_delivery_fee function from delivery_fee.py.
     The calculated fee is then returned as part of a DeliveryFeeResponse object.
+
+    Example:
+        {
+            "cart_value": 975,
+            "delivery_distance": 3520,
+            "number_of_items": 3,
+            "time": "2024-01-31T17:00:00Z"
+        }
     """
     fee: int = calculate_delivery_fee(order_data)
     return DeliveryFeeResponse(delivery_fee=fee)
