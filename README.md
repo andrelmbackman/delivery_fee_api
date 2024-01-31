@@ -109,7 +109,7 @@ curl -X "POST" -H "Content-Type: application/json" -d "{\"cart_value\": 975, \"d
 </table>
 
 ## Requirements
-(No need to worry about these if you created a virtual environment)
+(No need to worry about these if you followed the steps under 'Getting started')
 ```
 fastapi==0.109.0
 httpx==0.26.0
