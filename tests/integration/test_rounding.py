@@ -5,8 +5,8 @@ from tests.conftest import API_ENDPOINT
 
 
 """
-Tests that ensure that rounding is handled properly. Due to the nature of the
-rush hour multiplier, only decimals of .2, .4, .6, and .8 are generated.
+Tests that ensure that rounding is handled properly. Since the
+rush hour multiplier is 1.2, only decimals of .2, .4, .6, and .8 are generated.
 """
 
 
@@ -27,7 +27,6 @@ def test_round_down_dot_two():
 
 def test_round_down_dot_four():
     """Test rounding down for a fractional value ending in .4"""
-
     with TestClient(app) as client:
         payload = {
             "cart_value": 998,
