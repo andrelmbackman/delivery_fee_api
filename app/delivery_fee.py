@@ -107,16 +107,16 @@ def is_rush_hour(time: str) -> bool:
     timezone offset considered. Exception should never be raised, since the field has
     been validated, but we don't want to add a rush hour fee if anything unexpected happens.
     """
-    FRIDAY: int = 4
-    RUSH_HOUR_START: int = 15
-    RUSH_HOUR_END: int = 19
+    rush_day: int = OrderConstants.RUSH_HOUR_DAY
+    rush_start: int = OrderConstants.RUSH_HOUR_START
+    rush_end: int = OrderConstants.RUSH_HOUR_END
 
     try:
         order_time: datetime = parser.isoparse(time)
         order_time_utc = order_time.astimezone(timezone.utc)
 
-        is_friday = order_time_utc.weekday() == FRIDAY
-        is_rush_hour = RUSH_HOUR_START <= order_time_utc.hour < RUSH_HOUR_END
+        is_friday = order_time_utc.weekday() == rush_day
+        is_rush_hour = rush_start <= order_time_utc.hour < rush_end
 
         return is_friday and is_rush_hour
     except Exception:
